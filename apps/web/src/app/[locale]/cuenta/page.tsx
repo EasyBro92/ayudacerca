@@ -10,6 +10,8 @@ import { Link } from '@/i18n/navigation';
 import { requireUser } from '@/server/auth/session';
 import { signOutAction } from '@/server/actions/auth';
 import { getFavoriteListings } from '@/server/data/favorites';
+import { DeleteAccount } from '@/components/account/delete-account';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
@@ -20,6 +22,8 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
   const [t, tNav] = await Promise.all([getTranslations('account'), getTranslations('nav')]);
 
   const favorites = await getFavoriteListings(locale);
+  const supabase = await createSupabaseServerClient();
+  const { data: deletion } = await supabase.from('account_deletion_requests').select('scheduled_for').eq('status', 'pending').maybeSingle();
 
   return (
     <div className="container-page py-8">
@@ -36,6 +40,7 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
         </form>
       </Card>
 
+      {deletion ? <div className="mt-6"><DeleteAccount scheduledFor={deletion.scheduled_for} /></div> : null}
       {!user.emailVerified ? <Alert variant="warning" className="mt-6">{t('emailPending')}</Alert> : null}
 
       <Alert variant="info" title={t('nextSteps')} className="mt-6"><p>{t('nextStepsText')}</p></Alert>
@@ -50,6 +55,8 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
           </ul>
         )}
       </section>
+
+      {!deletion ? <section className="mt-12"><DeleteAccount scheduledFor={null} /></section> : null}
     </div>
   );
 }

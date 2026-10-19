@@ -2,7 +2,7 @@
 
 /*
  * Tokens de diseño. Los valores DEBEN coincidir con packages/core/src/brand.ts
- * (lo comprueba src/styles/tokens.test.ts).
+ * (lo comprueba packages/core/src/brand-sync.test.ts).
  */
 @theme {
   --color-background: #FBF7F1;

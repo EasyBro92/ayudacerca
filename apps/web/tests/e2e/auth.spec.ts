@@ -79,3 +79,18 @@ test.describe('cuenta', () => {
     await expect(page).toHaveURL(/\/entrar\?volver=%2Fcuenta/);
   });
 });
+
+test('eliminar la cuenta desde la web y cancelarlo dentro del plazo', async ({ page }, info) => {
+  await page.goto('/entrar');
+  await dismissCookies(page);
+  await page.getByLabel('Correo electrónico').fill(info.project.name === 'movil' ? 'ines.g@example.com' : 'victor.e@example.com');
+  await page.getByLabel('Contraseña', { exact: true }).fill('AyudaDemo2026!');
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
+  await page.waitForURL(/\/cuenta/);
+  await ready(page);
+  await page.getByRole('button', { name: 'Eliminar mi cuenta' }).click();
+  await page.getByRole('button', { name: 'Sí, eliminar mi cuenta' }).click();
+  await expect(page.getByText(/Tu cuenta se eliminará el/)).toBeVisible();
+  await page.getByRole('button', { name: 'Cancelar la eliminación' }).click();
+  await expect(page.getByText(/Tu cuenta se eliminará el/)).toBeHidden();
+});

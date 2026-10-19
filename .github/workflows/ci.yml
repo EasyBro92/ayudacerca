@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Tipos, lint y pruebas unitarias
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test:coverage
+
+  database:
+    name: Base de datos (migraciones + RLS con pgTAP)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
+      - run: supabase test db
+
+  e2e:
+    name: Extremo a extremo (web y app)
+    runs-on: ubuntu-latest
+    needs: [checks, database]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - run: pnpm install --frozen-lockfile
+      - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
+      - name: Variables de entorno de prueba (claves locales de Supabase, no son secretos)
+        run: |
+          eval "$(supabase status -o env)"
+          {
+            echo "NEXT_PUBLIC_APP_URL=http://localhost:3000"
+            echo "NEXT_PUBLIC_APP_ENV=development"
+            echo "NEXT_PUBLIC_DEMO_MODE=1"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+            echo "API_ALLOWED_ORIGINS=http://localhost:8081"
+          } > apps/web/.env.local
+          {
+            echo "EXPO_PUBLIC_SUPABASE_URL=$API_URL"
+            echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "EXPO_PUBLIC_WEB_URL=http://localhost:3000"
+          } > apps/mobile/.env
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm build
+      - name: Pruebas E2E de la web (móvil y escritorio)
+        run: pnpm test:e2e
+      - name: Pruebas E2E de la app (exportación web)
+        run: |
+          pnpm --filter @ayudacerca/web start &
+          pnpm --filter @ayudacerca/mobile export:web
+          npx --yes serve -s apps/mobile/dist-web -l 8081 &
+          sleep 5
+          pnpm --filter @ayudacerca/mobile test:e2e
+      - name: La app compila para Android e iOS
+        run: pnpm --filter @ayudacerca/mobile export:check
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: |
+            apps/web/test-results
+            apps/mobile/test-results

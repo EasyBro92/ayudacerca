@@ -50,9 +50,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "test": "playwright test",
     "export:check": "expo export --platform android --platform ios --output-dir dist-check",
     "export:web": "expo export --platform web --output-dir dist-web",
     "test:e2e": "playwright test"

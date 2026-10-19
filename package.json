@@ -2,15 +2,39 @@
   "name": "ayudacerca",
   "private": true,
   "packageManager": "pnpm@10.28.0",
-  "scripts": {},
+  "scripts": {
+    "dev": "pnpm --filter @ayudacerca/web dev",
+    "dev:mobile": "pnpm --filter @ayudacerca/mobile start",
+    "build": "pnpm --filter @ayudacerca/web build",
+    "lint": "pnpm -r --parallel --if-present lint",
+    "typecheck": "pnpm -r --parallel --if-present typecheck",
+    "test": "pnpm --filter @ayudacerca/core test",
+    "test:coverage": "pnpm --filter @ayudacerca/core test:coverage",
+    "test:e2e": "pnpm --filter @ayudacerca/web test:e2e",
+    "test:e2e:mobile": "pnpm --filter @ayudacerca/mobile export:web && pnpm --filter @ayudacerca/mobile test:e2e",
+    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm db:test",
+    "db:start": "SUPABASE_INTERNAL_IMAGE_REGISTRY=${SUPABASE_INTERNAL_IMAGE_REGISTRY:-docker.io} supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:types": "supabase gen types typescript --local --schema public > /tmp/db.ts && (echo '// GENERADO con: pnpm db:types — no editar a mano'; cat /tmp/db.ts) > packages/core/src/database.types.ts",
+    "db:seeds": "node scripts/generate-seeds.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "admin:create": "node scripts/create-admin.mjs"
+  },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@playwright/test": "1.56.1",
     "@types/node": "^22.20.5",
     "@vitest/coverage-v8": "5.0.5",
+    "eslint": "^9.39.5",
     "fast-check": "^4.10.2",
     "supabase": "^2.121.0",
     "typescript": "5.9.3",
+    "typescript-eslint": "8.71.2",
     "vitest": "5.0.5"
+  },
+  "engines": {
+    "node": ">=22.12"
   }
 }
