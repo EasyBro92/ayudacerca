@@ -24,7 +24,7 @@ scripts/        generación de semillas e iconos, alta de administración, captu
 
 - Node.js ≥ 22.12 y pnpm 10 (`corepack enable`)
 - Docker (para Supabase local)
-- Para la app: la app **Expo Go** no sirve (usa módulos nativos); se usa una *development build* (ver `docs/MOBILE_STORES.md`)
+- Para probar la app en tu móvil: la app gratuita **Expo Go** (todos los módulos nativos que usa están incluidos). Guía paso a paso: `docs/INICIAR.md`
 
 ## Puesta en marcha (local)
 
@@ -55,7 +55,7 @@ Los 30 perfiles y 50 anuncios de demo son **ficticios** y la semilla se niega a 
 
 ```bash
 cp apps/mobile/.env.example apps/mobile/.env   # en un móvil físico usa la IP de tu ordenador, no 127.0.0.1
-pnpm --filter @ayudacerca/mobile exec expo run:android   # o run:ios (requiere Mac) — o una development build con EAS
+pnpm dev:mobile                                # muestra un QR: escanéalo con Expo Go
 ```
 
 ## Comprobaciones
