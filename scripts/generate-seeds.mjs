@@ -48,7 +48,7 @@ const flags = [
   ['ai_help_assistant', false, 'Asistente del centro de ayuda'],
   ['google_login', false, 'Iniciar sesión con Google'],
   ['apple_login', false, 'Iniciar sesión con Apple (obligatorio en iOS si hay login social)'],
-  ['payments', true, 'Pagos de reservas (simulador si no hay claves de Stripe)'],
+  ['payments', false, 'Pagos de reservas — EN PAUSA por decisión del propietario (simulador si no hay claves de Stripe)'],
 ];
 for (const [key, enabled, description] of flags) {
   req.push(`insert into public.feature_flags (key, enabled, description) values (${q(key)}, ${enabled}, ${q(description)}) on conflict (key) do nothing;`);

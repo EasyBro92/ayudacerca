@@ -1,5 +1,7 @@
 # ADR 0002 — Pagos dentro de las apps y normas de Apple/Google
 
+> ⏸️ Los pagos están en pausa desde el 19/10/2026 (ver `docs/ROADMAP.md`). Esta decisión sigue vigente para cuando se reactiven.
+
 - Estado: aceptada (revisar antes de cada envío a las tiendas: las normas cambian)
 - Fecha: 2026-10-19
 

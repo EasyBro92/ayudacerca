@@ -1,6 +1,6 @@
 # Hoja de ruta
 
-Leyenda: ✅ hecho · 🟡 parcial · ⬜ pendiente. Especificación completa en `docs/PRODUCT_SPEC.md`.
+Leyenda: ✅ hecho · 🟡 parcial · ⬜ pendiente · ⏸️ en pausa. Especificación completa en `docs/PRODUCT_SPEC.md`.
 
 ## Informe — Fases 0 a 3 (primera ejecución)
 
@@ -54,8 +54,11 @@ Repositorio vacío: proyecto nuevo.
 
 ## Fase 4 — Conversación y contratación ⬜
 Chat en tiempo real (Supabase Realtime, canales privados), adjuntos, bloqueo y denuncia de conversaciones, propuestas versionadas, reservas con máquina de estados y eventos, notificaciones en la app y por correo.
+Mientras los pagos estén en pausa, las reservas funcionan **sin cobro dentro de la app** (las partes acuerdan el pago entre ellas) y se diseñan para que el pago se pueda enganchar después sin migraciones destructivas.
 
-## Fase 5 — Pagos ⬜
+## Fase 5 — Pagos ⏸️ En pausa
+> **Decisión del propietario (19/10/2026):** de momento no se usan pagos. No se implementa esta fase, pero **no se borra nada**: se conservan el diseño (`docs/PAYMENT_FLOW.md`), el cálculo de comisiones probado (`packages/core/src/money/fees.ts`), el ADR 0002 y el flag `payments` (desactivado en las semillas). Para reactivarla: activar el flag y retomar este plan.
+
 Stripe Connect Express (modo test) + simulador, webhooks idempotentes, motor de cancelación, reembolsos, incidencias, contracargos, valoraciones ciegas. Sembrar reservas y valoraciones reales en la demo. Anonimizar en vez de borrar los registros con obligación legal de conservación.
 
 ## Fase 6 — Plataforma ⬜

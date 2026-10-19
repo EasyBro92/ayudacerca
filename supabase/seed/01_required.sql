@@ -180,7 +180,7 @@ insert into public.feature_flags (key, enabled, description) values ('promoted_l
 insert into public.feature_flags (key, enabled, description) values ('ai_help_assistant', false, 'Asistente del centro de ayuda') on conflict (key) do nothing;
 insert into public.feature_flags (key, enabled, description) values ('google_login', false, 'Iniciar sesión con Google') on conflict (key) do nothing;
 insert into public.feature_flags (key, enabled, description) values ('apple_login', false, 'Iniciar sesión con Apple (obligatorio en iOS si hay login social)') on conflict (key) do nothing;
-insert into public.feature_flags (key, enabled, description) values ('payments', true, 'Pagos de reservas (simulador si no hay claves de Stripe)') on conflict (key) do nothing;
+insert into public.feature_flags (key, enabled, description) values ('payments', false, 'Pagos de reservas — EN PAUSA por decisión del propietario (simulador si no hay claves de Stripe)') on conflict (key) do nothing;
 
 -- Ajustes de plataforma
 insert into public.platform_settings (key, value, description, is_public) values ('listings.expiry_days', '30'::jsonb, 'Días que dura publicado un anuncio', true) on conflict (key) do nothing;

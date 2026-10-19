@@ -1,5 +1,7 @@
 # Flujo de pagos (diseño — se implementa en la fase 5)
 
+> ⏸️ **En pausa (19/10/2026).** El propietario ha decidido no usar pagos de momento. Este diseño y `packages/core/src/money/fees.ts` se conservan tal cual; el flag `payments` está desactivado. No borrar.
+
 > Borrador técnico. El modelo de fondos debe validarse con Stripe y con asesoría jurídica (PSD2) antes de activarlo.
 
 ## Modelo propuesto
