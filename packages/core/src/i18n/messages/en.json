@@ -406,7 +406,18 @@
     "nextStepsText": "Listings, messages and bookings will arrive in the next phases. You can already explore listings and save favourites.",
     "favorites": "My saved listings",
     "noFavorites": "You haven’t saved any listings yet.",
-    "emailPending": "Confirm your email to post and contact people."
+    "emailPending": "Confirm your email to post and contact people.",
+    "deleteTitle": "Delete my account",
+    "deleteText": "Your profile and listings will be hidden immediately. You’ll have 14 days to change your mind; after that we’ll delete your account and data, except what the law requires us to keep.",
+    "deleteConfirmTitle": "Are you sure you want to delete your account?",
+    "deleteConfirm": "Yes, delete my account",
+    "deletePending": "Your account will be deleted on {date}. Until then you can cancel it.",
+    "cancelDeletion": "Cancel deletion",
+    "language": "Language",
+    "legalTitle": "Legal information",
+    "welcomeTitle": "Your space on {brand}",
+    "welcomeText": "Sign in to save favourites and post listings. Soon you’ll also be able to chat with people and book.",
+    "version": "Version {version}"
   },
   "a11y": {
     "skipToContent": "Skip to content",

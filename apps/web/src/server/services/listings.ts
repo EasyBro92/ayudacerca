@@ -4,8 +4,12 @@ import {
   listingSubmitSchema, ok, validateCustomValues,
 } from '@ayudacerca/core';
 import { createSupabaseAdminClient } from '@/lib/supabase/admin';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import type { Database } from '@ayudacerca/core';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { CurrentUser } from '@/server/auth/session';
+
+/** Contexto de una petición autenticada: la persona y un cliente con SU sesión (RLS aplica). */
+export interface Ctx { user: CurrentUser; supabase: SupabaseClient<Database> }
 import { log } from '@/server/log';
 
 export interface DraftImage { path: string; width: number; height: number }
@@ -28,8 +32,7 @@ export interface DraftData {
   images?: DraftImage[] | undefined;
 }
 
-export async function getOrCreateDraft(user: CurrentUser, draftId: string | null, initial: DraftData) {
-  const supabase = await createSupabaseServerClient();
+export async function getOrCreateDraft({ user, supabase }: Ctx, draftId: string | null, initial: DraftData) {
   if (draftId) {
     const { data } = await supabase.from('listing_drafts').select('id, data, step').eq('id', draftId).maybeSingle();
     if (data) return data as { id: string; data: DraftData; step: number };
@@ -39,8 +42,7 @@ export async function getOrCreateDraft(user: CurrentUser, draftId: string | null
   return data as { id: string; data: DraftData; step: number };
 }
 
-export async function saveDraft(user: CurrentUser, draftId: string, data: DraftData, step: number): Promise<ApiResult<null>> {
-  const supabase = await createSupabaseServerClient();
+export async function saveDraft({ user, supabase }: Ctx, draftId: string, data: DraftData, step: number): Promise<ApiResult<null>> {
   // Las imágenes solo las gestiona el servidor: nunca se aceptan rutas enviadas por el cliente
   const { data: current } = await supabase.from('listing_drafts').select('data').eq('id', draftId).maybeSingle();
   if (!current) return fail('not_found');
@@ -54,8 +56,7 @@ export async function saveDraft(user: CurrentUser, draftId: string, data: DraftD
   return ok(null);
 }
 
-export async function addDraftImage(user: CurrentUser, draftId: string, image: { data: Buffer; width: number; height: number }): Promise<ApiResult<DraftImage>> {
-  const supabase = await createSupabaseServerClient();
+export async function addDraftImage({ user, supabase }: Ctx, draftId: string, image: { data: Buffer; width: number; height: number }): Promise<ApiResult<DraftImage>> {
   const { data: draft } = await supabase.from('listing_drafts').select('data').eq('id', draftId).maybeSingle();
   if (!draft) return fail('not_found');
   const data = draft.data as DraftData;
@@ -74,8 +75,7 @@ export async function addDraftImage(user: CurrentUser, draftId: string, image: {
   return ok(entry);
 }
 
-export async function removeDraftImage(user: CurrentUser, draftId: string, path: string): Promise<ApiResult<null>> {
-  const supabase = await createSupabaseServerClient();
+export async function removeDraftImage({ user, supabase }: Ctx, draftId: string, path: string): Promise<ApiResult<null>> {
   const { data: draft } = await supabase.from('listing_drafts').select('data').eq('id', draftId).maybeSingle();
   if (!draft) return fail('not_found');
   const data = draft.data as DraftData;
@@ -88,11 +88,10 @@ export async function removeDraftImage(user: CurrentUser, draftId: string, path:
 export type SubmitOutcome = { status: 'published' | 'pending_review'; slug: string };
 
 /** Valida el borrador completo y crea el anuncio. Toda la autorización y la moderación ocurren aquí. */
-export async function submitDraft(user: CurrentUser, draftId: string): Promise<ApiResult<SubmitOutcome>> {
+export async function submitDraft({ user, supabase }: Ctx, draftId: string): Promise<ApiResult<SubmitOutcome>> {
   if (!user.emailVerified) return fail('email_not_verified', 'emailRequired');
   if (user.status !== 'active') return fail('account_suspended');
 
-  const supabase = await createSupabaseServerClient();
   const admin = createSupabaseAdminClient();
   const { data: draft } = await supabase.from('listing_drafts').select('id, data').eq('id', draftId).maybeSingle();
   if (!draft) return fail('not_found');

@@ -30,7 +30,25 @@ function contentSecurityPolicy(nonce: string): string {
   ].join('; ');
 }
 
+// Orígenes web que pueden llamar a /api/v1 desde el navegador (p. ej. la app exportada a web en pruebas).
+// Las apps nativas no envían Origin y no necesitan CORS.
+const API_ORIGINS = new Set((process.env.API_ALLOWED_ORIGINS ?? '').split(',').map((o) => o.trim()).filter(Boolean));
+
+function corsHeaders(origin: string | null): Record<string, string> {
+  if (!origin || !API_ORIGINS.has(origin)) return {};
+  return {
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Max-Age': '600',
+    Vary: 'Origin',
+  };
+}
+
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith('/api/v1') && request.method === 'OPTIONS') {
+    return new NextResponse(null, { status: 204, headers: corsHeaders(request.headers.get('origin')) });
+  }
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const csp = contentSecurityPolicy(nonce);
   const correlationId = request.headers.get('x-correlation-id') ?? crypto.randomUUID();
@@ -59,6 +77,9 @@ export async function proxy(request: NextRequest) {
 
   response.headers.set('Content-Security-Policy', csp);
   response.headers.set('x-correlation-id', correlationId);
+  if (request.nextUrl.pathname.startsWith('/api/v1')) {
+    for (const [k, v] of Object.entries(corsHeaders(request.headers.get('origin')))) response.headers.set(k, v);
+  }
   return response;
 }
 

@@ -24,7 +24,7 @@ export default async function PublishPage({ params, searchParams }: PageProps<'/
     const { data: latest } = await supabase.from('listing_drafts').select('id').order('updated_at', { ascending: false }).limit(1).maybeSingle();
     draftId = latest?.id ?? null;
   }
-  const draft = await getOrCreateDraft(user, draftId, kind ? { kind } : {});
+  const draft = await getOrCreateDraft({ user, supabase: await createSupabaseServerClient() }, draftId, kind ? { kind } : {});
   if (kind && !draft.data.kind) draft.data.kind = kind;
 
   const supabase = createSupabasePublicClient();

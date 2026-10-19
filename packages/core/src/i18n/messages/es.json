@@ -406,7 +406,18 @@
     "nextStepsText": "Las secciones de publicaciones, mensajes y reservas llegarán en las próximas fases. Ya puedes explorar anuncios y guardar favoritos.",
     "favorites": "Mis favoritos",
     "noFavorites": "Aún no has guardado ningún anuncio.",
-    "emailPending": "Confirma tu correo para poder publicar y contactar."
+    "emailPending": "Confirma tu correo para poder publicar y contactar.",
+    "deleteTitle": "Eliminar mi cuenta",
+    "deleteText": "Tu perfil y tus anuncios dejarán de verse al momento. Tendrás 14 días para arrepentirte; después borraremos tu cuenta y tus datos, salvo los que la ley nos obligue a conservar.",
+    "deleteConfirmTitle": "¿Seguro que quieres eliminar tu cuenta?",
+    "deleteConfirm": "Sí, eliminar mi cuenta",
+    "deletePending": "Tu cuenta se eliminará el {date}. Hasta entonces puedes cancelarlo.",
+    "cancelDeletion": "Cancelar la eliminación",
+    "language": "Idioma",
+    "legalTitle": "Información legal",
+    "welcomeTitle": "Tu espacio en {brand}",
+    "welcomeText": "Entra para guardar favoritos y publicar anuncios. Muy pronto también podrás hablar con otras personas y reservar.",
+    "version": "Versión {version}"
   },
   "a11y": {
     "skipToContent": "Saltar al contenido",

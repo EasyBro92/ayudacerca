@@ -406,7 +406,18 @@
     "nextStepsText": "Les seccions de publicacions, missatges i reserves arribaran en les properes fases. Ja pots explorar anuncis i desar preferits.",
     "favorites": "Els meus preferits",
     "noFavorites": "Encara no has desat cap anunci.",
-    "emailPending": "Confirma el correu per poder publicar i contactar."
+    "emailPending": "Confirma el correu per poder publicar i contactar.",
+    "deleteTitle": "Eliminar el meu compte",
+    "deleteText": "El teu perfil i els teus anuncis deixaran de veure’s a l’instant. Tindràs 14 dies per fer-te enrere; després esborrarem el compte i les dades, excepte les que la llei ens obligui a conservar.",
+    "deleteConfirmTitle": "Segur que vols eliminar el teu compte?",
+    "deleteConfirm": "Sí, eliminar el meu compte",
+    "deletePending": "El teu compte s’eliminarà el {date}. Fins llavors ho pots cancel·lar.",
+    "cancelDeletion": "Cancel·lar l’eliminació",
+    "language": "Idioma",
+    "legalTitle": "Informació legal",
+    "welcomeTitle": "El teu espai a {brand}",
+    "welcomeText": "Entra per desar preferits i publicar anuncis. Molt aviat també podràs parlar amb altres persones i reservar.",
+    "version": "Versió {version}"
   },
   "a11y": {
     "skipToContent": "Saltar al contingut",

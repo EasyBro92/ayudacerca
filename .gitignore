@@ -29,3 +29,6 @@ playwright-report/
 apps/web/test-results/
 apps/web/playwright-report/
 apps/web/next-env.d.ts
+dist-check/
+dist-web/
+test-results/

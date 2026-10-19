@@ -4,7 +4,9 @@
 
 create table public.audit_logs (
   id              bigint generated always as identity primary key,
-  actor_id        uuid references public.profiles (id) on delete set null,
+  -- Sin clave foránea a propósito: la auditoría es inmutable y debe sobrevivir a la baja de la persona
+  -- (queda solo un identificador seudónimo).
+  actor_id        uuid,
   action          text not null,
   entity_type     text not null,
   entity_id       text,

@@ -3,6 +3,7 @@
 import { type ApiResult, fail } from '@ayudacerca/core';
 import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/server/auth/session';
 import { rateLimit } from '@/server/security/rate-limit';
 import { ImageError, processUploadedImage } from '@/server/services/images';
@@ -15,7 +16,7 @@ export async function saveDraftAction(id: string, data: DraftData, step: number)
   const user = await getCurrentUser();
   if (!user) return fail('unauthenticated');
   if (!rateLimit(`draft:${user.id}`, 120, 60_000).ok) return fail('rate_limited');
-  return saveDraft(user, id, data, step);
+  return saveDraft({ user, supabase: await createSupabaseServerClient() }, id, data, step);
 }
 
 export async function uploadDraftImageAction(id: string, form: FormData): Promise<ApiResult<DraftImage>> {
@@ -27,7 +28,7 @@ export async function uploadDraftImageAction(id: string, form: FormData): Promis
   if (!(file instanceof File)) return fail('validation', 'invalidImage');
   try {
     const processed = await processUploadedImage(await file.arrayBuffer());
-    return addDraftImage(user, id, processed);
+    return addDraftImage({ user, supabase: await createSupabaseServerClient() }, id, processed);
   } catch (error) {
     if (error instanceof ImageError) return fail('validation', error.reason);
     return fail('internal');
@@ -38,7 +39,7 @@ export async function removeDraftImageAction(id: string, path: string): Promise<
   if (!draftId.safeParse(id).success) return fail('validation');
   const user = await getCurrentUser();
   if (!user) return fail('unauthenticated');
-  return removeDraftImage(user, id, path);
+  return removeDraftImage({ user, supabase: await createSupabaseServerClient() }, id, path);
 }
 
 export async function submitDraftAction(id: string): Promise<ApiResult<SubmitOutcome>> {
@@ -46,7 +47,7 @@ export async function submitDraftAction(id: string): Promise<ApiResult<SubmitOut
   const user = await getCurrentUser();
   if (!user) return fail('unauthenticated');
   if (!rateLimit(`publish:${user.id}`, 10, 60 * 60_000).ok) return fail('rate_limited');
-  const result = await submitDraft(user, id);
+  const result = await submitDraft({ user, supabase: await createSupabaseServerClient() }, id);
   if (result.ok) revalidateTag('catalog', 'max');
   return result;
 }

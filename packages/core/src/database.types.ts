@@ -6,7 +6,21 @@ export type Database = {
   
   "public": {
           Tables: {
-            "audit_logs": {
+            "account_deletion_requests": {
+                  Row: {
+                    "cancelled_at": string | null,"created_at": string,"id": string,"requested_at": string,"scheduled_for": string,"status": string,"updated_at": string,"user_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "cancelled_at"?: string | null,"created_at"?: string,"id"?: string,"requested_at"?: string,"scheduled_for"?: string,"status"?: string,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Update: {
+                    "cancelled_at"?: string | null,"created_at"?: string,"id"?: string,"requested_at"?: string,"scheduled_for"?: string,"status"?: string,"updated_at"?: string,"user_id"?: string | null
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"audit_logs": {
                   Row: {
                     "action": string,"actor_id": string | null,"after": Json | null,"before": Json | null,"correlation_id": string | null,"created_at": string,"entity_id": string | null,"entity_type": string,"id": number,"ip_truncated": string | null,"reason": string | null
                   }
@@ -479,6 +493,9 @@ isOneToOne: false
             "approximate_point":
 { Args: { "lat": number,"lng": number }; Returns: unknown
                            },
+"cancel_account_deletion":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
 "category_listing_counts":
 { Args: Record<PropertyKey, never>; Returns: {
               "category_id": number,"published_count": number
@@ -500,6 +517,9 @@ isOneToOne: false
                            },
 "record_listing_view":
 { Args: { "p_listing_id": string }; Returns: undefined
+                           },
+"request_account_deletion":
+{ Args: Record<PropertyKey, never>; Returns: string
                            },
 "search_listings":
 { Args: { "p_category"?: string,"p_ids"?: (string)[],"p_kind"?: Database["public"]['Enums']["listing_kind"],"p_limit"?: number,"p_min_rating"?: number,"p_modality"?: Database["public"]['Enums']["listing_modality"],"p_municipality"?: string,"p_offset"?: number,"p_price_max"?: number,"p_price_min"?: number,"p_price_type"?: Database["public"]['Enums']["price_type"],"p_query"?: string,"p_radius_km"?: number,"p_recent_days"?: number,"p_sort"?: string,"p_subcategory"?: string,"p_urgent_only"?: boolean,"p_verified_only"?: boolean,"p_with_photo"?: boolean }; Returns: {

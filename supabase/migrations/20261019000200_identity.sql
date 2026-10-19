@@ -181,8 +181,9 @@ create table public.legal_acceptances (
   user_agent   text
 );
 create index legal_acceptances_user_idx on public.legal_acceptances (user_id, kind);
-create trigger legal_acceptances_immutable before update or delete on public.legal_acceptances
-  for each row when (current_user <> 'postgres') execute function private.prevent_mutation();
+-- No se pueden modificar; sí se eliminan en cascada si se borra la cuenta
+create trigger legal_acceptances_immutable before update on public.legal_acceptances
+  for each row execute function private.prevent_mutation();
 
 -- ---------------------------------------------------------------------
 -- Alta automática del perfil al registrarse
