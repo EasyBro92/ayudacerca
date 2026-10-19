@@ -48,7 +48,7 @@ const W = {
 
 export const categories = [
   {
-    slug: 'hogar-limpieza', icon: 'spray-can', color: '#2F7D74',
+    slug: 'hogar-limpieza', icon: 'spray-can', color: '#2B736B',
     name: t('Hogar y limpieza', 'Llar i neteja', 'Home & cleaning'),
     description: t('Limpieza, plancha, orden y tareas del hogar.', 'Neteja, planxa, ordre i feines de la llar.', 'Cleaning, ironing, tidying and household tasks.'),
     subs: [
@@ -60,7 +60,7 @@ export const categories = [
     ],
   },
   {
-    slug: 'mudanzas-transporte', icon: 'truck', color: '#A85A24',
+    slug: 'mudanzas-transporte', icon: 'truck', color: '#A15623',
     name: t('Mudanzas y transporte', 'Mudances i transport', 'Moving & transport'),
     description: t('Pequeñas mudanzas, transporte de muebles y entregas.', 'Mudances petites, transport de mobles i lliuraments.', 'Small moves, furniture transport and deliveries.'),
     subs: [
@@ -116,7 +116,7 @@ export const categories = [
     ],
   },
   {
-    slug: 'acompanamiento-mayores', icon: 'hand-heart', color: '#B04B6F',
+    slug: 'acompanamiento-mayores', icon: 'hand-heart', color: '#A9486B',
     name: t('Acompañamiento de mayores', 'Acompanyament de gent gran', 'Senior companionship'),
     description: t('Compañía, paseos y acompañamiento a citas.', 'Companyia, passejades i acompanyament a visites.', 'Company, walks and accompaniment to appointments.'),
     warnings: W.seniors, sensitive: true, review: true,
@@ -128,7 +128,7 @@ export const categories = [
     ],
   },
   {
-    slug: 'mascotas', icon: 'paw-print', color: '#8F6A1F',
+    slug: 'mascotas', icon: 'paw-print', color: '#86641D',
     name: t('Mascotas', 'Mascotes', 'Pets'),
     description: t('Paseos, cuidado en casa y visitas a mascotas.', 'Passejades, cura a casa i visites a mascotes.', 'Walks, pet sitting and visits.'),
     subs: [
@@ -159,7 +159,7 @@ export const categories = [
     ],
   },
   {
-    slug: 'jardineria-exterior', icon: 'sprout', color: '#457A33',
+    slug: 'jardineria-exterior', icon: 'sprout', color: '#427531',
     name: t('Jardinería y exterior', 'Jardineria i exterior', 'Gardening & outdoors'),
     description: t('Césped, poda, riego y terrazas.', 'Gespa, poda, reg i terrasses.', 'Lawns, pruning, watering and terraces.'),
     subs: [
@@ -194,7 +194,7 @@ export const categories = [
     ],
   },
   {
-    slug: 'cuidado-ninos', icon: 'baby', color: '#B8622A',
+    slug: 'cuidado-ninos', icon: 'baby', color: '#A2521C',
     name: t('Cuidado de niños', 'Cura d’infants', 'Childcare'),
     description: t('Canguro, recogida del colegio y ayuda con deberes.', 'Cangur, recollida de l’escola i ajuda amb els deures.', 'Babysitting, school pick-up and homework help.'),
     warnings: W.children, sensitive: true, review: true, photos: false, verifications: ['identity'],
