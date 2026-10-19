@@ -1,6 +1,6 @@
 import {
-  BadgeCheck, CalendarCheck, CircleCheck, ClipboardList, CreditCard, FileText, Flag, Handshake, HeartHandshake,
-  LifeBuoy, Lock, MapPin, MessageCircle, PackageCheck, PenLine, ShieldCheck, Smartphone, Star, Stethoscope,
+  BadgeCheck, CalendarCheck, CircleCheck, ClipboardList, Code, FileText, Flag, Handshake, LifeBuoy, MapPin,
+  MessageCircle, MonitorSmartphone, Palette, PenLine, ShieldCheck, Smartphone, Star, Video,
 } from 'lucide-react';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { CategoryIcon } from '@/components/common/category-icon';
@@ -15,7 +15,7 @@ import { getCategories, getPlatformStats } from '@/server/data/catalog';
 import { getFavoriteIds } from '@/server/data/favorites';
 import { getRecentListings } from '@/server/data/listings';
 
-const QUICK = ['recados-gestiones', 'tecnologia-soporte', 'hogar-limpieza', 'acompanamiento-mayores', 'mascotas', 'clases-formacion', 'mudanzas-transporte', 'montaje-reparaciones'];
+const QUICK = ['tecnologia-soporte', 'desarrollo-web', 'diseno-contenido', 'ofimatica-datos', 'clases-formacion', 'tramites-online', 'traduccion-redaccion', 'otros'];
 
 export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const { locale } = await params;
@@ -30,7 +30,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   const anyStat = Object.values(stats.visible).some(Boolean);
 
   const grid = (items: typeof offers) => (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {items.map((l) => <ListingCard key={l.id} listing={l} saved={favoriteIds.has(l.id)} />)}
     </div>
   );
@@ -55,10 +55,10 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       {/* ACCESOS RÁPIDOS */}
       <section aria-labelledby="quick" className="container-page">
         <h2 id="quick" className="mb-4 text-xl">{t('quickTitle')}</h2>
-        <ul className="flex gap-3 overflow-x-auto pb-2 [scrollbar-width:thin] md:grid md:grid-cols-4 lg:grid-cols-8">
+        <ul className="stagger -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-4 md:px-0 lg:grid-cols-8">
           {quick.map((c) => (
-            <li key={c.slug} className="shrink-0">
-              <Link href={`/categorias/${c.slug}`} className="flex w-32 flex-col items-center gap-2 rounded-[var(--radius-lg)] border border-border bg-surface p-3 text-center text-sm font-semibold hover:border-primary md:w-auto">
+            <li key={c.slug} className="shrink-0 snap-start">
+              <Link href={`/categorias/${c.slug}`} className="press flex h-full w-32 flex-col items-center gap-2 rounded-[var(--radius-lg)] border border-border bg-surface p-3 text-center text-sm font-semibold hover:border-primary md:w-auto">
                 <CategoryIcon icon={c.icon} color={c.color} />
                 {c.name}
               </Link>
@@ -92,19 +92,19 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       {/* CASOS DE USO */}
       <section aria-labelledby="usecases" className="container-page mt-16">
         <h2 id="usecases" className="mb-6 text-3xl">{t('useCasesTitle')}</h2>
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {([
-            [Stethoscope, t('useCaseAppointment'), 'acompanamiento-mayores'],
-            [FileText, t('useCaseDocuments'), 'recados-gestiones'],
-            [ClipboardList, t('useCaseOnline'), 'recados-gestiones'],
+            [CalendarCheck, t('useCaseAppointment'), 'tramites-online'],
+            [FileText, t('useCaseDocuments'), 'ofimatica-datos'],
+            [ClipboardList, t('useCaseOnline'), 'tramites-online'],
             [Smartphone, t('useCasePhone'), 'tecnologia-soporte'],
-            [Handshake, t('useCaseFurniture'), 'montaje-reparaciones'],
-            [HeartHandshake, t('useCasePet'), 'mascotas'],
-            [PenLine, t('useCaseLesson'), 'clases-formacion'],
-            [PackageCheck, t('useCaseDelivery'), 'mudanzas-transporte'],
+            [Code, t('useCaseFurniture'), 'desarrollo-web'],
+            [Palette, t('useCasePet'), 'diseno-contenido'],
+            [Video, t('useCaseLesson'), 'clases-formacion'],
+            [ShieldCheck, t('useCaseDelivery'), 'tecnologia-soporte'],
           ] as const).map(([Icon, label, slug]) => (
             <li key={label}>
-              <Link href={`/categorias/${slug}`} className="flex h-full items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-4 font-semibold hover:border-primary">
+              <Link href={`/categorias/${slug}`} className="press flex h-full items-center gap-3 rounded-[var(--radius-lg)] border border-border bg-surface p-4 font-semibold hover:border-primary">
                 <Icon aria-hidden className="size-6 shrink-0 text-primary" /> {label}
               </Link>
             </li>
@@ -148,7 +148,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
               [PenLine, t('how1Title'), t('how1Text')],
               [MessageCircle, t('how2Title'), t('how2Text')],
               [Handshake, t('how3Title'), t('how3Text')],
-              [CreditCard, t('how4Title'), t('how4Text')],
+              [MonitorSmartphone, t('how4Title'), t('how4Text')],
               [CalendarCheck, t('how5Title'), t('how5Text')],
               [Star, t('how6Title'), t('how6Text')],
             ] as const).map(([Icon, title, text], i) => (
@@ -169,9 +169,9 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       {/* SEGURIDAD */}
       <section aria-labelledby="safety" className="container-page mt-16">
         <h2 id="safety" className="mb-6 text-3xl">{t('safetyTitle')}</h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {([
-            [Lock, t('safety1Title'), t('safety1Text')],
+            [MessageCircle, t('safety1Title'), t('safety1Text')],
             [BadgeCheck, t('safety2Title'), t('safety2Text')],
             [CircleCheck, t('safety3Title'), t('safety3Text')],
             [LifeBuoy, t('safety4Title'), t('safety4Text')],

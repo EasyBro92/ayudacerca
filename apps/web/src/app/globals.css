@@ -34,8 +34,26 @@
   --radius-lg: 16px;
   --radius-xl: 24px;
 
-  --shadow-card: 0 1px 2px rgb(31 27 22 / 0.06), 0 2px 8px rgb(31 27 22 / 0.05);
-  --shadow-raised: 0 4px 16px rgb(31 27 22 / 0.10);
+  --shadow-card: 0 1px 2px rgb(22 26 46 / 0.06), 0 2px 8px rgb(22 26 46 / 0.05);
+  --shadow-raised: 0 4px 16px rgb(22 26 46 / 0.12);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-rise: rise 0.42s var(--ease-out-soft) both;
+  --animate-pop: pop 0.28s var(--ease-spring) both;
+  --animate-bubble: bubble 0.26s var(--ease-out-soft) both;
+  --animate-sheet-up: sheet-up 0.32s var(--ease-out-soft) both;
+  --animate-fade: fade 0.2s ease-out both;
+  --animate-page: page-in 0.3s var(--ease-out-soft) backwards;
+  --animate-shimmer: shimmer 1.4s linear infinite;
+
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  @keyframes pop { from { opacity: 0; transform: scale(0.85); } }
+  @keyframes bubble { from { opacity: 0; transform: translateY(6px) scale(0.97); } }
+  @keyframes sheet-up { from { transform: translateY(100%); } }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
+  @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 }
 
 @layer base {
@@ -91,6 +109,33 @@
   }
 }
 
+/* Efecto al pulsar, como en las apps nativas */
+@utility press {
+  transition: transform 0.15s var(--ease-out-soft), background-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  &:active { transform: scale(0.97); }
+}
+
+/* Entrada escalonada de listas (máx. ~10 elementos con retardo) */
+@utility stagger {
+  & > * { animation: var(--animate-rise); animation-delay: calc(min(var(--i, 0), 10) * 40ms); }
+  & > *:nth-child(1) { --i: 0; } & > *:nth-child(2) { --i: 1; } & > *:nth-child(3) { --i: 2; }
+  & > *:nth-child(4) { --i: 3; } & > *:nth-child(5) { --i: 4; } & > *:nth-child(6) { --i: 5; }
+  & > *:nth-child(7) { --i: 6; } & > *:nth-child(8) { --i: 7; } & > *:nth-child(9) { --i: 8; }
+  & > *:nth-child(n + 10) { --i: 9; }
+}
+
+/* Esqueleto de carga con brillo */
+@utility shimmer {
+  background: linear-gradient(90deg, var(--color-surface-muted) 25%, var(--color-border) 50%, var(--color-surface-muted) 75%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@utility safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 @utility safe-bottom {
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
@@ -107,3 +152,32 @@
 .legal-prose th, .legal-prose td { border: 1px solid var(--color-border); padding: 0.5rem; text-align: left; vertical-align: top; }
 .legal-prose th { background: var(--color-surface-muted); }
 .legal-prose a { color: var(--color-primary); text-decoration: underline; }
+
+/* Conversación: pantalla completa en móvil (como una app), tarjeta en escritorio */
+.chat-shell { position: fixed; inset: 0; z-index: 40; padding-top: env(safe-area-inset-top); }
+@media (width >= 48rem) {
+  .chat-shell { position: static; inset: auto; z-index: auto; height: calc(100dvh - 8rem); min-height: 28rem; padding-top: 0; }
+}
+@media (width < 48rem) {
+  body:has(.chat-shell) { overflow: hidden; }
+}
+
+/* Barra inferior: indicador animado de la pestaña activa */
+.tab-indicator { transition: transform 0.25s var(--ease-spring), opacity 0.2s; }
+
+/* Quitar el resaltado azul al tocar en móviles y evitar el rebote del documento en la PWA */
+html { -webkit-tap-highlight-color: transparent; }
+@media (display-mode: standalone) {
+  html, body { overscroll-behavior-y: none; }
+  body { user-select: none; -webkit-user-select: none; }
+  input, textarea, [contenteditable], p, li, h1, h2, h3 { user-select: text; -webkit-user-select: text; }
+}
+
+/* Transiciones entre páginas (navegadores con View Transitions) */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: 0.18s ease-out both fade-out; }
+::view-transition-new(root) { animation: 0.26s var(--ease-out-soft) both page-in; }
+@keyframes fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

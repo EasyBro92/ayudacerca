@@ -13,4 +13,5 @@ export * from './search/params';
 export * from './auth/schemas';
 export * from './api/result';
 export * from './color/contrast';
+export * from './chat/chat';
 export type { Database, Json, Tables, Enums } from './database.types';

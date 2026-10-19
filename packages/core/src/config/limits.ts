@@ -23,6 +23,11 @@ export const limits = {
     passwordMin: 10,
     passwordMax: 128,
   },
+  chat: {
+    messageMax: 2000,
+    pageSize: 50,
+    previewMax: 140,
+  },
   search: {
     pageSize: 20,
     maxOffset: 1000,

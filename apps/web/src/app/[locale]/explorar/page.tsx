@@ -82,7 +82,7 @@ export default async function ExplorePage({ params, searchParams }: PageProps<'/
               </div>
             </div>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {result.items.map((l) => (
                 <li key={l.id} className="flex"><div className="w-full"><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></div></li>
               ))}

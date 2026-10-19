@@ -4,7 +4,7 @@ import { dismissCookies, expectAccessible } from './helpers';
 test.describe('páginas públicas', () => {
   test('portada: secciones principales y accesibilidad', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Ayuda de confianza');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Ayuda con la tecnología');
     await expect(page.getByRole('heading', { name: 'Anuncios recientes' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Cómo funciona', level: 2 })).toBeVisible();
     await dismissCookies(page);
@@ -14,18 +14,18 @@ test.describe('páginas públicas', () => {
   test('la búsqueda de la portada lleva a Explorar con los filtros en la URL', async ({ page }) => {
     await page.goto('/');
     await dismissCookies(page);
-    await page.getByLabel('¿Qué necesitas?').fill('perro');
-    await page.getByLabel('¿Dónde?').selectOption('valencia');
+    await page.getByLabel('¿Qué necesitas?').fill('python');
+    await page.getByLabel('¿Dónde?').selectOption('madrid');
     await page.getByRole('button', { name: 'Buscar ayuda' }).click();
-    await expect(page).toHaveURL(/\/explorar\?q=perro&en=valencia/);
+    await expect(page).toHaveURL(/\/explorar\?q=python&en=madrid/);
     await expect(page.getByRole('heading', { name: /resultado/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Paseos de perros/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Clases de programación en Python/ })).toBeVisible();
   });
 
   test('explorar: filtros compartibles, estado vacío útil y accesibilidad', async ({ page }) => {
-    await page.goto('/explorar?categoria=mascotas&tipo=ofrecen');
+    await page.goto('/explorar?categoria=diseno-contenido&tipo=ofrecen');
     await dismissCookies(page);
-    await expect(page.getByRole('link', { name: /Paseos de perros/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Disseny de logos/ })).toBeVisible();
     await expectAccessible(page);
 
     await page.goto('/explorar?q=submarinismo');
@@ -40,9 +40,17 @@ test.describe('páginas públicas', () => {
   });
 
   test('categoría con advertencia de seguridad', async ({ page }) => {
-    await page.goto('/categorias/recados-gestiones');
-    await expect(page.getByRole('heading', { level: 1, name: 'Recados y gestiones' })).toBeVisible();
+    await page.goto('/categorias/tramites-online');
+    await expect(page.getByRole('heading', { level: 1, name: 'Trámites online' })).toBeVisible();
     await expect(page.getByText(/nunca compartas contraseñas, PIN/)).toBeVisible();
+  });
+
+  test('las categorías presenciales están ocultas por ahora', async ({ page }) => {
+    const res = await page.goto('/categorias/acompanamiento-mayores');
+    expect(res?.status()).toBe(404);
+    await page.goto('/categorias');
+    await expect(page.getByRole('link', { name: /Informática y soporte técnico/ }).first()).toBeVisible();
+    await expect(page.getByText('Acompañamiento de mayores')).toHaveCount(0);
   });
 
   test('detalle: autor, ubicación aproximada, sin datos privados y accesible', async ({ page }) => {
@@ -66,7 +74,7 @@ test.describe('páginas públicas', () => {
   test('catalán e inglés sin mezclar idiomas', async ({ page }) => {
     await page.goto('/ca');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ajuda de confiança, a la cantonada');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ajuda amb la tecnologia, sense sortir de casa');
     await page.goto('/en/explorar');
     await expect(page.getByRole('heading', { level: 1 })).toHaveText('Find help or people to help');
   });

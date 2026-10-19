@@ -31,7 +31,10 @@ export function MobileMenu({ signedIn, displayName }: { signedIn: boolean; displ
           <Link href="/seguridad" className={item} onClick={close}>{t('safety')}</Link>
           <hr className="my-2 border-border" />
           {signedIn ? (
-            <Link href="/cuenta" className={item} onClick={close}>{t('account')}</Link>
+            <>
+              <Link href="/mensajes" className={item} onClick={close}>{t('messages')}</Link>
+              <Link href="/cuenta" className={item} onClick={close}>{t('account')}</Link>
+            </>
           ) : (
             <>
               <Link href="/entrar" className={item} onClick={close}>{t('signIn')}</Link>

@@ -52,8 +52,11 @@ Repositorio vacío: proyecto nuevo.
 - ⬜ Catálogo completo de municipios del INE (hoy 46 ciudades)
 - ⬜ Traducción catalana e inglesa de los documentos legales
 
-## Fase 4 — Conversación y contratación ⬜
-Chat en tiempo real (Supabase Realtime, canales privados), adjuntos, bloqueo y denuncia de conversaciones, propuestas versionadas, reservas con máquina de estados y eventos, notificaciones en la app y por correo.
+## Fase 4 — Conversación y contratación 🟡
+- ✅ Chat en tiempo real (Supabase Realtime con RLS) en web/PWA y app: «Contactar» desde el anuncio, bandeja con no leídos, aviso de datos de contacto, bloqueo y denuncia, límites y términos prohibidos en la base de datos
+- ⬜ Adjuntos en el chat
+- ⬜ Propuestas versionadas y reservas (sin cobro mientras los pagos estén en pausa)
+- ⬜ Notificaciones por correo y push de mensajes nuevos
 Mientras los pagos estén en pausa, las reservas funcionan **sin cobro dentro de la app** (las partes acuerdan el pago entre ellas) y se diseñan para que el pago se pueda enganchar después sin migraciones destructivas.
 
 ## Fase 5 — Pagos ⏸️ En pausa
@@ -67,6 +70,12 @@ Notificaciones push (Expo Push en la app, Web Push en la web), PWA offline, pane
 ## Fase 7 — Producción ⬜
 Entorno de pruebas en marcha (19/10/2026): web en **Vercel (Hobby)** conectada a Supabase en la nube, sin datos de demo. De momento Supabase en el **plan gratuito** (decisión del propietario; ver `docs/SUPABASE_NUBE.md`). Antes de publicar en las tiendas, valorar Pro.
 OWASP ASVS nivel 2, auditoría de accesibilidad manual (VoiceOver/TalkBack), rendimiento (Lighthouse CI), Sentry, revisión de cumplimiento (RGPD, DSA, DAC7, LSSI, consumo), fichas de las tiendas.
+
+## Cambios del 19/10/2026 (segunda tanda)
+- Enfoque telemático e informático (ADR 0009): categorías presenciales ocultas, nuevas categorías, textos y datos de demo adaptados.
+- Nueva paleta (índigo + naranja) e iconos regenerados.
+- Versión móvil con aspecto de app: barra inferior con Mensajes e insignia, transiciones de página, listas animadas, efecto al pulsar, hojas que suben desde abajo, conversación a pantalla completa.
+- **Para aplicarlo en la nube:** volver a lanzar la acción «Supabase: subir base de datos» en GitHub (crea las tablas del chat y actualiza el catálogo).
 
 ## Deuda técnica conocida
 - `apps/mobile` usa `expo-router` NativeTabs; en la exportación web la barra aparece arriba (solo afecta a las pruebas web).

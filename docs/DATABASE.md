@@ -33,8 +33,13 @@ PostgreSQL 17 (Supabase) con PostGIS, `pg_trgm`, `unaccent`, `pgcrypto` y `pg_cr
 | `account_deletion_requests` | Solicitudes de baja (14 días de gracia) | Ver la propia; RPC para pedir/cancelar |
 | `audit_logs` | Auditoría inmutable (sin FK: sobrevive a las bajas) | Solo administración la lee; nadie la modifica |
 | `feature_flags`, `platform_settings` | Configuración | Lectura pública de lo marcado como público |
+| `conversations` | Chat sobre un anuncio entre quien escribe (`requester_id`) y quien publicó (`owner_id`). Guarda vista previa y lecturas | Solo participantes leen; se crean solo con `start_conversation()`. Si se borra una cuenta, la conversación queda para la otra persona |
+| `messages` | Mensajes del chat (máx. 2000 caracteres) | Participantes leen e insertan (solo `conversation_id` y `body`). Un disparador valida participante, bloqueos, 20 mensajes/minuto y términos prohibidos (`reject` bloquea, `review` marca `flagged`). En tiempo real (Realtime) |
+| `conversation_reports` | Denuncias de conversaciones | Participantes crean; moderación lee |
 
-Tablas de fases futuras (conversaciones, propuestas, reservas, pagos, incidencias, valoraciones, notificaciones…) están definidas en `docs/PRODUCT_SPEC.md` §24.
+Las categorías tienen `is_active`: las presenciales están ocultas por ahora (ADR 0009). La semilla del catálogo hace *upsert*, así que volver a ejecutar la acción «Supabase: subir base de datos» actualiza textos, orden y visibilidad.
+
+Tablas de fases futuras (propuestas, reservas, pagos, incidencias, valoraciones, notificaciones…) están definidas en `docs/PRODUCT_SPEC.md` §24.
 
 ## Funciones expuestas
 | Función | Uso |
@@ -45,6 +50,8 @@ Tablas de fases futuras (conversaciones, propuestas, reservas, pagos, incidencia
 | `record_listing_view(id)` | Solo servidor |
 | `has_staff_role(role)` | Comprobación de rol en políticas |
 | `request_account_deletion()` / `cancel_account_deletion()` | Baja de cuenta |
+| `start_conversation(listing, body)` | Abre o reutiliza la conversación sobre un anuncio y envía el primer mensaje (máx. 30 nuevas al día) |
+| `mark_conversation_read(id)` / `unread_conversations_count()` | Lecturas e insignia de no leídos |
 
 ## Tareas programadas (`pg_cron`)
 | Tarea | Horario |
@@ -70,7 +77,10 @@ erDiagram
   listings ||--o{ listing_custom_values : detalla
   listings ||--o{ listing_reports : recibe
   listings ||--o{ listing_favorites : aparece_en
+  listings ||--o{ conversations : origina
+  conversations ||--o{ messages : contiene
+  conversations ||--o{ conversation_reports : recibe
 ```
 
 ## Pruebas (pgTAP)
-`pnpm db:test` — 41 pruebas: RLS en todas las tablas, perfiles (privacidad, columnas protegidas), anuncios (transiciones, suplantación, contadores, borradores ocultos), auditoría inmutable, roles, publicación desde el servidor, baja de cuenta completa.
+`pnpm db:test` — 60 pruebas: RLS en todas las tablas, perfiles (privacidad, columnas protegidas), anuncios (transiciones, suplantación, contadores, borradores ocultos, categorías ocultas), auditoría inmutable, roles, publicación desde el servidor, baja de cuenta completa y chat (participantes, suplantación, términos, no leídos, bloqueos).

@@ -11,6 +11,7 @@ import { CategoryIcon } from '@/components/common/category-icon';
 import { JsonLd } from '@/components/common/json-ld';
 import { FavoriteButton } from '@/components/listings/favorite-button';
 import { Gallery } from '@/components/listings/gallery';
+import { ContactButton } from '@/components/chat/contact-button';
 import { ListingCard } from '@/components/listings/listing-card';
 import { ReportDialog } from '@/components/listings/report-dialog';
 import { ShareButton } from '@/components/listings/share-button';
@@ -22,6 +23,7 @@ import { storagePublicUrl } from '@/config/env';
 import { Link } from '@/i18n/navigation';
 import { absoluteUrl, alternates } from '@/lib/seo';
 import { getCurrentUser } from '@/server/auth/session';
+import { getMyConversationForListing } from '@/server/data/chat';
 import { getFavoriteIds } from '@/server/data/favorites';
 import { getListingBySlug, getSimilarListings, wasListingRemoved } from '@/server/data/listings';
 
@@ -63,6 +65,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
     getTranslations('nav'), getTranslations('price'), getTranslations('kinds'), getTranslations('modalities'),
     getTranslations('common'), getFormatter(), getSimilarListings(listing, locale), getFavoriteIds(),
   ]);
+  const existingConversationId = user && user.id !== listing.author_id ? await getMyConversationForListing(listing.id, user.id) : null;
   const isOwner = user?.id === listing.author_id;
   const price = formatPrice(listing.price_cents, listing.price_type, locale, (k, v) => tPrice(k as 'free', v as never));
   const categoryName = localized(listing.category.name, locale);
@@ -84,8 +87,18 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
     });
   const statusNotice = { paused: t('statusPaused'), reserved: t('statusReserved'), completed: t('statusCompleted'), expired: t('statusExpired') }[listing.status as string];
   // El chat llega en la fase 4: hasta entonces los botones se muestran deshabilitados con explicación
-  const CHAT_AVAILABLE = false;
-  const canContact = CHAT_AVAILABLE && listing.status === 'published' && !isOwner;
+  const canContact = listing.status === 'published' && !isOwner;
+  const contact = (size: 'md' | 'lg', className?: string) => (
+    <ContactButton
+      listingId={listing.id}
+      listingSlug={listing.slug}
+      authorName={listing.author.display_name}
+      signedIn={Boolean(user)}
+      existingConversationId={existingConversationId}
+      size={size}
+      {...(className ? { className } : {})}
+    />
+  );
 
   if (!isOwner) {
     after(async () => {
@@ -189,8 +202,8 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
               <Alert>{t('ownListing')}</Alert>
             ) : (
               <>
-                <Button size="lg" disabled={!canContact} aria-describedby="contact-soon"><MessageCircle aria-hidden /> {t('contact')}</Button>
-                <Button size="lg" variant="outline" disabled={!canContact} aria-describedby="contact-soon">{t('requestProposal')}</Button>
+                {canContact ? contact('lg') : <Button size="lg" disabled><MessageCircle aria-hidden /> {t('contact')}</Button>}
+                <Button size="lg" variant="outline" disabled aria-describedby="contact-soon">{t('requestProposal')}</Button>
                 <p id="contact-soon" className="text-sm text-ink-muted">{t('contactSoon')}</p>
                 <FavoriteButton listingId={listing.id} initialSaved={favoriteIds.has(listing.id)} listingTitle={listing.title} withLabel />
               </>
@@ -238,7 +251,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
             <p className="truncate text-xs text-ink-muted">{t('contactSoon')}</p>
           </div>
           <FavoriteButton listingId={listing.id} initialSaved={favoriteIds.has(listing.id)} listingTitle={listing.title} />
-          <Button disabled={!canContact} size="lg"><MessageCircle aria-hidden /> {t('contact')}</Button>
+          {canContact ? contact('lg', 'press') : <Button disabled size="lg"><MessageCircle aria-hidden /> {t('contact')}</Button>}
         </div>
       ) : null}
     </div>

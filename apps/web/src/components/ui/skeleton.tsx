@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div aria-hidden className={cn('animate-pulse rounded-[var(--radius-md)] bg-surface-muted', className)} />;
+  return <div aria-hidden className={cn('shimmer rounded-[var(--radius-md)]', className)} />;
 }

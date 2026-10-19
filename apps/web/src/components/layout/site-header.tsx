@@ -1,6 +1,7 @@
 import { brand } from '@ayudacerca/core';
 import { Plus, Search } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
+import { MessagesLink } from '@/components/chat/messages-link';
 import { Avatar } from '@/components/common/avatar';
 import { Logo } from '@/components/layout/logo';
 import { MobileMenu } from '@/components/layout/mobile-menu';
@@ -32,10 +33,11 @@ export async function SiteHeader() {
           <Button asChild variant="accent" className="hidden sm:inline-flex">
             <Link href="/publicar"><Plus aria-hidden /> {t('publish')}</Link>
           </Button>
+          {user ? <MessagesLink /> : null}
           {user ? (
-            <Link href="/cuenta" className="hidden items-center gap-2 rounded-full py-1 pl-1 pr-3 font-semibold hover:bg-surface-muted md:inline-flex" aria-label={`${t('account')}: ${user.displayName}`}>
+            <Link href="/cuenta" className="press hidden items-center gap-2 rounded-full py-1 pl-1 pr-3 font-semibold hover:bg-surface-muted md:inline-flex">
               <Avatar name={user.displayName} path={user.avatarPath} size={36} />
-              <span className="max-w-32 truncate">{user.displayName}</span>
+              <span className="max-w-32 truncate"><span className="sr-only">{t('account')}: </span>{user.displayName}</span>
             </Link>
           ) : (
             <Button asChild variant="outline" className="hidden md:inline-flex">

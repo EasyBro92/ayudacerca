@@ -60,7 +60,7 @@ export default async function ProfilePage({ params }: PageProps<'/[locale]/perso
 
       <section aria-labelledby="their-listings" className="mt-10">
         <h2 id="their-listings" className="mb-4 text-2xl">{(await getTranslations('categories'))('listingsCount', { count: listings.length })}</h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {listings.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
         </ul>
       </section>

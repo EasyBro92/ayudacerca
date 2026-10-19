@@ -37,18 +37,18 @@ test.describe('publicar', () => {
     // Paso 2: sin categoría no avanza
     await next(page);
     await expect(page.getByText('Revisa los campos marcados antes de continuar.')).toBeVisible();
-    await page.locator('main label', { hasText: 'Jardinería y exterior' }).click();
-    await page.getByLabel('Subcategoría', { exact: true }).selectOption({ label: 'Riego en vacaciones' });
+    await page.locator('main label', { hasText: 'Informática y soporte técnico' }).click();
+    await page.getByLabel('Subcategoría', { exact: true }).selectOption({ label: 'Asistencia remota' });
     await next(page);
 
     // Paso 3: un teléfono en el texto bloquea el avance
-    const title = `Riego de plantas en vacaciones ${info.project.name} ${Date.now() % 100000}`;
+    const title = `Asistencia remota para tu ordenador ${info.project.name} ${Date.now() % 100000}`;
     await page.getByLabel('Título', { exact: true }).fill(title);
-    await page.getByLabel('Descripción', { exact: true }).fill('Riego tus plantas mientras estás fuera. Llámame al 612 345 678 y lo hablamos.');
+    await page.getByLabel('Descripción', { exact: true }).fill('Te ayudo con tu ordenador por conexión remota. Llámame al 612 345 678 y lo hablamos.');
     await expect(page.getByText('Parece que has incluido datos de contacto')).toBeVisible();
     await next(page);
-    await expect(page.getByText(/Quita teléfonos, correos, enlaces/)).toBeVisible();
-    await page.getByLabel('Descripción', { exact: true }).fill('Riego tus plantas y balcones mientras estás de vacaciones. Paso cada dos días y te escribo por el chat.');
+    await expect(page.getByText(/Quita teléfonos, correos o enlaces/)).toBeVisible();
+    await page.getByLabel('Descripción', { exact: true }).fill('Te ayudo con tu ordenador por conexión remota: programas, correo e impresoras. Te escribo por el chat.');
     await next(page);
 
     // Paso 4
@@ -91,16 +91,16 @@ test.describe('publicar', () => {
     await expect(page.getByText('Este es tu anuncio').filter({ visible: true })).toHaveCount(1);
   });
 
-  test('categorías sensibles van a revisión manual', async ({ page }, info) => {
+  test('las categorías con revisión manual envían el anuncio a revisión', async ({ page }, info) => {
     test.setTimeout(90_000);
     await signIn(page, info.project.name === 'movil' ? 'miguel.a@example.com' : 'rosa.d@example.com');
     await page.goto('/publicar?nuevo=1&tipo=necesito');
     await ready(page);
-    await page.locator('main label', { hasText: 'Acompañamiento de mayores' }).click();
-    await page.getByLabel('Subcategoría', { exact: true }).selectOption({ label: 'Paseos y compañía' });
+    await page.locator('main label', { hasText: 'Otros servicios' }).click();
+    await page.getByLabel('Subcategoría', { exact: true }).selectOption({ label: 'Varios' });
     await next(page);
-    await page.getByLabel('Título', { exact: true }).fill('Compañía para pasear por las mañanas');
-    await page.getByLabel('Descripción', { exact: true }).fill('Busco a alguien amable que acompañe a mi madre a pasear dos mañanas por semana por el barrio.');
+    await page.getByLabel('Título', { exact: true }).fill('Ayuda para organizar un álbum de fotos digital');
+    await page.getByLabel('Descripción', { exact: true }).fill('Busco a alguien que me ayude a ordenar y etiquetar las fotos familiares en un álbum digital compartido.');
     await next(page);
     await page.getByRole('radio', { name: 'Presencial' }).check();
     await page.getByLabel('Municipio', { exact: true }).selectOption({ label: 'Córdoba (Córdoba)' });

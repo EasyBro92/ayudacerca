@@ -22,7 +22,7 @@ export async function ListingCard({ listing, saved = false, headingLevel = 3 }: 
   const isOffer = listing.kind === 'offer';
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface shadow-[var(--shadow-card)] transition-shadow focus-within:shadow-[var(--shadow-raised)] hover:shadow-[var(--shadow-raised)]">
+    <article className="press group relative flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] border border-border bg-surface shadow-[var(--shadow-card)] transition-shadow focus-within:shadow-[var(--shadow-raised)] hover:shadow-[var(--shadow-raised)]">
       <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-muted">
         {listing.coverPath ? (
           <Image src={storagePublicUrl('listing-images', listing.coverPath)} alt="" fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />

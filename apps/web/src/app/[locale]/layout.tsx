@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import type { ReactNode } from 'react';
+import { UnreadProvider } from '@/components/chat/unread-provider';
+import { getCurrentUser } from '@/server/auth/session';
 import { BottomNav } from '@/components/layout/bottom-nav';
 import { CookieBanner } from '@/components/layout/cookie-banner';
 import { SiteFooter } from '@/components/layout/site-footer';
@@ -56,12 +58,13 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const [tA11y, tCommon] = await Promise.all([getTranslations('a11y'), getTranslations('common')]);
+  const [tA11y, tCommon, user] = await Promise.all([getTranslations('a11y'), getTranslations('common'), getCurrentUser()]);
 
   return (
     <html lang={locale} className={atkinson.variable}>
       <body className="min-h-dvh">
         <NextIntlClientProvider>
+          <UnreadProvider userId={user?.id ?? null}>
           <a href="#contenido" className="sr-only z-50 rounded-md bg-primary px-4 py-2 text-on-primary focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
             {tA11y('skipToContent')}
           </a>
@@ -75,6 +78,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
           <SiteFooter />
           <BottomNav />
           <CookieBanner />
+          </UnreadProvider>
         </NextIntlClientProvider>
       </body>
     </html>
