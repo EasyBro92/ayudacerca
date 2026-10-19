@@ -1,0 +1,52 @@
+# Aplica las migraciones y los datos básicos al proyecto de Supabase en la nube.
+# Se lanza a mano: GitHub → Actions → «Supabase: subir base de datos» → Run workflow.
+# Necesita el secreto SUPABASE_DB_URL (ver docs/SUPABASE_NUBE.md).
+name: 'Supabase: subir base de datos'
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Solo mostrar qué se aplicaría (no cambia nada)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Comprobar el secreto
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "::error::Falta el secreto SUPABASE_DB_URL. Sigue docs/SUPABASE_NUBE.md."
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with: { version: 2.121.0 }
+
+      - name: Migraciones
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            supabase db push --db-url "$SUPABASE_DB_URL" --dry-run
+          else
+            supabase db push --db-url "$SUPABASE_DB_URL" --yes
+          fi
+
+      # Catálogo, municipios, ajustes y textos legales. Se puede repetir sin duplicar nada.
+      # Nunca se cargan los datos de demo (usuarios con contraseña conocida) en la nube.
+      - name: Datos básicos
+        if: ${{ !inputs.dry_run }}
+        run: psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q -f supabase/seed/01_required.sql

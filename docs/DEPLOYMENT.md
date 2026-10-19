@@ -1,6 +1,8 @@
 # Despliegue a producción
 
 ## 1. Supabase
+> Guía paso a paso con el plan gratuito y la acción de GitHub que sube la base de datos: `docs/SUPABASE_NUBE.md`.
+
 1. Crea un proyecto en la región UE (p. ej. Fráncfort o París).
 2. `supabase link --project-ref <ref>` y `supabase db push` (aplica las migraciones). **No** cargues `seed/02_demo.sql`; sí `seed/01_required.sql` (catálogo, municipios, ajustes, borradores legales): `psql "$DATABASE_URL" -f supabase/seed/01_required.sql`.
 3. Ejecuta `alter database postgres set app.environment = 'production';` (bloquea la semilla de demo).
