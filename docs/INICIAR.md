@@ -64,3 +64,24 @@ Los correos (confirmar cuenta, recuperar contraseña) llegan a **http://127.0.0.
 | «Docker is not running» | Abre Docker Desktop y espera a que arranque |
 | El QR no conecta | `pnpm dev:mobile -- --tunnel` |
 | Quieres empezar de cero los datos | `pnpm db:reset` |
+
+## Opción B: con tu Supabase en la nube (sin Docker)
+Si ya subiste la base de datos (`docs/SUPABASE_NUBE.md`), sáltate el paso 3 y Docker.
+Las claves están en Supabase → **Project Settings → API Keys**: la *Publishable key* (`sb_publishable_…`, o la *anon* en «Legacy API keys») y la *Secret key* (`sb_secret_…`, o la *service_role*). La URL es `https://<ref>.supabase.co`.
+
+`apps/web/.env.local`:
+```
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_ENV=development
+NEXT_PUBLIC_DEMO_MODE=0
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<Publishable key>
+SUPABASE_SERVICE_ROLE_KEY=<Secret key>
+```
+`apps/mobile/.env` (la IP es la de tu ordenador, para que el móvil llegue a la web al subir fotos):
+```
+EXPO_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<Publishable key>
+EXPO_PUBLIC_WEB_URL=http://192.168.1.40:3000
+```
+No hay usuarios ni anuncios de demo: regístrate con tu correo (te llega de verdad) y publica el primer anuncio.
