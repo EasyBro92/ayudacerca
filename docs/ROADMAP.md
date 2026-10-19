@@ -65,7 +65,7 @@ Stripe Connect Express (modo test) + simulador, webhooks idempotentes, motor de 
 Notificaciones push (Expo Push en la app, Web Push en la web), PWA offline, panel de administración con MFA, moderación con exposición de motivos y reclamaciones, centro de ayuda y tickets, tareas programadas, PRO y destacados (web; en apps tras integrar compras integradas — ADR 0002).
 
 ## Fase 7 — Producción ⬜
-De momento Supabase en el **plan gratuito** (decisión del propietario; ver `docs/SUPABASE_NUBE.md`). Antes de publicar en las tiendas, valorar Pro.
+Entorno de pruebas en marcha (19/10/2026): web en **Vercel (Hobby)** conectada a Supabase en la nube, sin datos de demo. De momento Supabase en el **plan gratuito** (decisión del propietario; ver `docs/SUPABASE_NUBE.md`). Antes de publicar en las tiendas, valorar Pro.
 OWASP ASVS nivel 2, auditoría de accesibilidad manual (VoiceOver/TalkBack), rendimiento (Lighthouse CI), Sentry, revisión de cumplimiento (RGPD, DSA, DAC7, LSSI, consumo), fichas de las tiendas.
 
 ## Deuda técnica conocida
