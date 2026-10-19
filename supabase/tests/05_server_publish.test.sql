@@ -8,7 +8,7 @@ set local role authenticated;
 select set_config('request.jwt.claims', json_build_object('sub', :autor, 'role', 'authenticated')::text, true);
 insert into public.listings (author_id, kind, title, description, category_id, municipality_id, modality, price_type, status)
 select :autor, 'request', 'Busco ayuda para pintar una habitación', 'Habitación de 10 metros cuadrados, la pintura ya la tengo comprada en casa.',
-       (select id from public.categories where slug = 'obras-pintura'), (select id from public.municipalities where slug = 'barcelona'), 'at_home', 'quote', 'draft';
+       (select id from public.categories where slug = 'diseno-contenido'), (select id from public.municipalities where slug = 'barcelona'), 'at_home', 'quote', 'draft';
 
 -- …y el servidor (service_role) lo publica tras moderar
 set local role service_role;

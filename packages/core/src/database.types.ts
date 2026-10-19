@@ -32,13 +32,7 @@ export type Database = {
                     "action"?: string,"actor_id"?: string | null,"after"?: Json | null,"before"?: Json | null,"correlation_id"?: string | null,"created_at"?: string,"entity_id"?: string | null,"entity_type"?: string,"id"?: never,"ip_truncated"?: string | null,"reason"?: string | null
                   }
                   Relationships: [
-                    {
-      foreignKeyName: "audit_logs_actor_id_fkey"
-      columns: ["actor_id"]
-isOneToOne: false
-      referencedRelation: "profiles"
-      referencedColumns: ["id"]
-    }
+                    
                   ]
                 },"blocked_terms": {
                   Row: {
@@ -85,6 +79,64 @@ isOneToOne: false
       columns: ["category_id"]
 isOneToOne: false
       referencedRelation: "categories"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"conversation_reports": {
+                  Row: {
+                    "conversation_id": string,"created_at": string,"details": string | null,"id": string,"reason": string,"reporter_id": string | null,"status": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "conversation_id": string,"created_at"?: string,"details"?: string | null,"id"?: string,"reason": string,"reporter_id"?: string | null,"status"?: string
+                  }
+                  Update: {
+                    "conversation_id"?: string,"created_at"?: string,"details"?: string | null,"id"?: string,"reason"?: string,"reporter_id"?: string | null,"status"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "conversation_reports_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversation_reports_reporter_id_fkey"
+      columns: ["reporter_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"conversations": {
+                  Row: {
+                    "created_at": string,"id": string,"last_message_at": string | null,"last_message_preview": string | null,"last_sender_id": string | null,"listing_id": string | null,"listing_title": string,"owner_id": string | null,"owner_last_read_at": string,"requester_id": string | null,"requester_last_read_at": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "created_at"?: string,"id"?: string,"last_message_at"?: string | null,"last_message_preview"?: string | null,"last_sender_id"?: string | null,"listing_id"?: string | null,"listing_title": string,"owner_id"?: string | null,"owner_last_read_at"?: string,"requester_id"?: string | null,"requester_last_read_at"?: string,"updated_at"?: string
+                  }
+                  Update: {
+                    "created_at"?: string,"id"?: string,"last_message_at"?: string | null,"last_message_preview"?: string | null,"last_sender_id"?: string | null,"listing_id"?: string | null,"listing_title"?: string,"owner_id"?: string | null,"owner_last_read_at"?: string,"requester_id"?: string | null,"requester_last_read_at"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "conversations_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_owner_id_fkey"
+      columns: ["owner_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "conversations_requester_id_fkey"
+      columns: ["requester_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
       referencedColumns: ["id"]
     }
                   ]
@@ -318,6 +370,32 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"messages": {
+                  Row: {
+                    "body": string,"conversation_id": string,"created_at": string,"flagged": boolean,"id": string,"sender_id": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "body": string,"conversation_id": string,"created_at"?: string,"flagged"?: boolean,"id"?: string,"sender_id"?: string | null
+                  }
+                  Update: {
+                    "body"?: string,"conversation_id"?: string,"created_at"?: string,"flagged"?: boolean,"id"?: string,"sender_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "messages_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "messages_sender_id_fkey"
+      columns: ["sender_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"municipalities": {
                   Row: {
                     "center": unknown,"created_at": string,"id": number,"ine_code": string | null,"name": string,"province": string,"region": string,"slug": string
@@ -510,6 +588,9 @@ isOneToOne: false
 "listing_transition_allowed":
 { Args: { "as_client": boolean,"from_s": Database["public"]['Enums']["listing_status"],"to_s": Database["public"]['Enums']["listing_status"] }; Returns: boolean
                            },
+"mark_conversation_read":
+{ Args: { "p_conversation_id": string }; Returns: undefined
+                           },
 "platform_stats":
 { Args: Record<PropertyKey, never>; Returns: {
               "completed_count": number,"rating_avg": number,"users_count": number,"verified_count": number
@@ -525,6 +606,12 @@ isOneToOne: false
 { Args: { "p_category"?: string,"p_ids"?: (string)[],"p_kind"?: Database["public"]['Enums']["listing_kind"],"p_limit"?: number,"p_min_rating"?: number,"p_modality"?: Database["public"]['Enums']["listing_modality"],"p_municipality"?: string,"p_offset"?: number,"p_price_max"?: number,"p_price_min"?: number,"p_price_type"?: Database["public"]['Enums']["price_type"],"p_query"?: string,"p_radius_km"?: number,"p_recent_days"?: number,"p_sort"?: string,"p_subcategory"?: string,"p_urgent_only"?: boolean,"p_verified_only"?: boolean,"p_with_photo"?: boolean }; Returns: {
               "author_avatar_path": string,"author_display_name": string,"author_identity_verified": boolean,"author_rating_avg": number,"author_rating_count": number,"author_response_time_minutes": number,"author_username": string,"category_color": string,"category_icon": string,"category_name": Json,"category_slug": string,"cover_path": string,"currency": string,"distance_km": number,"id": string,"is_urgent": boolean,"kind": Database["public"]['Enums']["listing_kind"],"modality": Database["public"]['Enums']["listing_modality"],"municipality_name": string,"price_cents": number,"price_type": Database["public"]['Enums']["price_type"],"province": string,"published_at": string,"slug": string,"status": Database["public"]['Enums']["listing_status"],"subcategory_name": Json,"title": string,"total_count": number
             }[]
+                           },
+"start_conversation":
+{ Args: { "p_body"?: string,"p_listing_id": string }; Returns: string
+                           },
+"unread_conversations_count":
+{ Args: Record<PropertyKey, never>; Returns: number
                            }
           }
           Enums: {

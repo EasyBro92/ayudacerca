@@ -10,9 +10,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(join(root, 'apps/web/package.json'));
 const sharp = require('sharp');
 
-const PRIMARY = '#1F6F6B';
-const ACCENT = '#C4472A';
-const BG = '#FBF7F1';
+const PRIMARY = '#4F46E5';
+const ACCENT = '#C2410C';
+const BG = '#F6F7FB';
 
 // Marca sin fondo (pin + corazón) dentro de una caja de 32×32
 const mark = `

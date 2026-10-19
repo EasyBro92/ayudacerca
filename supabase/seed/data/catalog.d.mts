@@ -7,6 +7,7 @@ export declare const categories: ReadonlyArray<{
   description: I18n;
   warnings?: I18n;
   restrictions?: I18n;
+  active?: boolean;
   sensitive?: boolean;
   review?: boolean;
   photos?: boolean;

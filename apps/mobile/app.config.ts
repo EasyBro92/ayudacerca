@@ -10,8 +10,8 @@ import type { ConfigContext, ExpoConfig } from 'expo/config';
  */
 const NAME = 'AyudaCerca';
 const BUNDLE_ID = 'com.ayudacerca.app';
-const PRIMARY = '#1F6F6B';
-const BACKGROUND = '#FBF7F1';
+const PRIMARY = '#4F46E5';
+const BACKGROUND = '#F6F7FB';
 const VERSION = '0.1.0';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({

@@ -20,7 +20,7 @@ export const type = {
 export const MIN_TOUCH = 48;
 
 export const shadow = {
-  shadowColor: '#1F1B16',
+  shadowColor: '#161A2E',
   shadowOpacity: 0.08,
   shadowRadius: 8,
   shadowOffset: { width: 0, height: 2 },

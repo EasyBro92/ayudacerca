@@ -24,13 +24,15 @@ for (const [slug, name, province, region, lat, lng] of municipalities) {
   req.push(`insert into public.municipalities (slug, name, province, region, center) values (${q(slug)}, ${q(name)}, ${q(province)}, ${q(region)}, public.approximate_point(${lat}, ${lng})) on conflict (slug) do nothing;`);
 }
 
-req.push('\n-- Categorías');
+req.push('\n-- Categorías (el catálogo vive en el código: al volver a cargar se actualizan textos, orden y visibilidad)');
 categories.forEach((c, i) => {
-  req.push(`insert into public.categories (slug, name, description, icon, color, sort_order, requires_review, is_sensitive, allow_photos, required_verifications, warnings, restrictions)
-values (${q(c.slug)}, ${j(c.name)}, ${j(c.description)}, ${q(c.icon)}, ${q(c.color)}, ${i + 1}, ${!!c.review}, ${!!c.sensitive}, ${c.photos !== false}, ${arr(c.verifications ?? [], 'public.verification_kind')}, ${j(c.warnings)}, ${j(c.restrictions)})
-on conflict (slug) do nothing;`);
+  req.push(`insert into public.categories (slug, name, description, icon, color, sort_order, is_active, requires_review, is_sensitive, allow_photos, required_verifications, warnings, restrictions)
+values (${q(c.slug)}, ${j(c.name)}, ${j(c.description)}, ${q(c.icon)}, ${q(c.color)}, ${i + 1}, ${c.active !== false}, ${!!c.review}, ${!!c.sensitive}, ${c.photos !== false}, ${arr(c.verifications ?? [], 'public.verification_kind')}, ${j(c.warnings)}, ${j(c.restrictions)})
+on conflict (slug) do update set name = excluded.name, description = excluded.description, icon = excluded.icon, color = excluded.color,
+  sort_order = excluded.sort_order, is_active = excluded.is_active, requires_review = excluded.requires_review, is_sensitive = excluded.is_sensitive,
+  allow_photos = excluded.allow_photos, required_verifications = excluded.required_verifications, warnings = excluded.warnings, restrictions = excluded.restrictions;`);
   c.subs.forEach(([slug, name], k) => {
-    req.push(`insert into public.subcategories (category_id, slug, name, sort_order) select id, ${q(slug)}, ${j(name)}, ${k + 1} from public.categories where slug = ${q(c.slug)} on conflict (category_id, slug) do nothing;`);
+    req.push(`insert into public.subcategories (category_id, slug, name, sort_order) select id, ${q(slug)}, ${j(name)}, ${k + 1} from public.categories where slug = ${q(c.slug)} on conflict (category_id, slug) do update set name = excluded.name, sort_order = excluded.sort_order;`);
   });
   (c.fields ?? []).forEach((f, k) => {
     const options = f.options ? f.options.map(([value, label]) => ({ value, label })) : null;

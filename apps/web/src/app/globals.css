@@ -5,19 +5,19 @@
  * (lo comprueba packages/core/src/brand-sync.test.ts).
  */
 @theme {
-  --color-background: #FBF7F1;
+  --color-background: #F6F7FB;
   --color-surface: #FFFFFF;
-  --color-surface-muted: #F3EDE4;
-  --color-border: #E6DDD0;
-  --color-ink: #1F1B16;
-  --color-ink-muted: #5E564D;
-  --color-primary: #1F6F6B;
-  --color-primary-strong: #175753;
-  --color-primary-soft: #E3F0EE;
+  --color-surface-muted: #ECEEF6;
+  --color-border: #DCE0EC;
+  --color-ink: #161A2E;
+  --color-ink-muted: #4E546B;
+  --color-primary: #4F46E5;
+  --color-primary-strong: #4338CA;
+  --color-primary-soft: #EEF0FF;
   --color-on-primary: #FFFFFF;
-  --color-accent: #C4472A;
-  --color-accent-strong: #A93A20;
-  --color-accent-soft: #FBE7E1;
+  --color-accent: #C2410C;
+  --color-accent-strong: #9A3412;
+  --color-accent-soft: #FFEDE3;
   --color-on-accent: #FFFFFF;
   --color-success: #276B43;
   --color-success-soft: #E4F2E9;
@@ -25,7 +25,7 @@
   --color-warning-soft: #FBF0D9;
   --color-danger: #B3261E;
   --color-danger-soft: #FBE4E2;
-  --color-focus: #1F6F6B;
+  --color-focus: #4F46E5;
 
   --font-sans: var(--font-atkinson), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 

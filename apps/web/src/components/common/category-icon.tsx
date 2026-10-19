@@ -1,6 +1,6 @@
 import {
-  Baby, ChefHat, ClipboardList, GraduationCap, HandHeart, type LucideIcon, PaintRoller, PartyPopper, PawPrint,
-  Scissors, Shapes, Smartphone, SprayCan, Sprout, Truck, Wrench,
+  Baby, ChefHat, ClipboardList, Code, FileCheck, FileSpreadsheet, GraduationCap, HandHeart, Languages, type LucideIcon,
+  MonitorSmartphone, PaintRoller, Palette, PartyPopper, PawPrint, Scissors, Shapes, Smartphone, SprayCan, Sprout, Truck, Wrench,
 } from 'lucide-react';
 import { tint } from '@ayudacerca/core';
 import { cn } from '@/lib/utils';
@@ -10,6 +10,8 @@ const ICONS: Record<string, LucideIcon> = {
   'spray-can': SprayCan, truck: Truck, wrench: Wrench, 'clipboard-list': ClipboardList, 'hand-heart': HandHeart,
   'paw-print': PawPrint, 'graduation-cap': GraduationCap, sprout: Sprout, smartphone: Smartphone,
   'party-popper': PartyPopper, baby: Baby, scissors: Scissors, 'paint-roller': PaintRoller, 'chef-hat': ChefHat, shapes: Shapes,
+  'monitor-smartphone': MonitorSmartphone, code: Code, palette: Palette, 'file-spreadsheet': FileSpreadsheet, 'file-check': FileCheck,
+  languages: Languages,
 };
 
 export function CategoryIcon({ icon, color, size = 'md', className }: { icon: string; color: string; size?: 'sm' | 'md' | 'lg'; className?: string }) {

@@ -1,5 +1,5 @@
 begin;
-select plan(15);
+select plan(17);
 
 \set cliente '\'00000000-0000-4000-a000-000000000001\''
 \set prestador '\'00000000-0000-4000-a000-000000000002\''
@@ -8,10 +8,14 @@ select plan(15);
 set local role authenticated;
 select set_config('request.jwt.claims', json_build_object('sub', :cliente, 'role', 'authenticated')::text, true);
 
+-- Catálogo: las categorías ocultas (presenciales, para más adelante) no se ven
+select is((select count(*)::int from public.categories where slug = 'acompanamiento-mayores'), 0, 'Las categorías ocultas no se muestran');
+select is((select count(*)::int from public.search_listings(p_limit => 50) s where s.category_slug in ('mascotas', 'acompanamiento-mayores', 'hogar-limpieza')), 0, 'Los anuncios de categorías ocultas no salen en las búsquedas');
+
 -- Crear borrador
 insert into public.listings (author_id, kind, title, description, category_id, municipality_id, modality, price_type, price_cents, status)
 select :cliente, 'request', 'Necesito ayuda para montar una estantería', 'Tengo una estantería en caja y no tengo herramientas para montarla en casa.',
-       (select id from public.categories where slug = 'montaje-reparaciones'),
+       (select id from public.categories where slug = 'tecnologia-soporte'),
        (select id from public.municipalities where slug = 'barcelona'), 'at_home', 'fixed', 3000, 'draft';
 
 select is((select count(*) from public.listings where author_id = :cliente and status = 'draft')::int, 1, 'La autora puede crear un borrador');
