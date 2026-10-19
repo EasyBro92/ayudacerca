@@ -84,14 +84,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Todo menos estáticos, imágenes optimizadas, archivos con extensión y prefetches
+  // Todo menos estáticos, imágenes optimizadas y archivos con extensión.
+  // Las precargas de <Link> TAMBIÉN deben pasar por aquí: necesitan la reescritura de idioma de next-intl.
   matcher: [
-    {
-      source: '/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|robots.txt|sitemap.xml|sw.js|.*\\.(?:svg|png|jpg|jpeg|webp|ico|woff2?)$).*)',
-      missing: [
-        { type: 'header', key: 'next-router-prefetch' },
-        { type: 'header', key: 'purpose', value: 'prefetch' },
-      ],
-    },
+    '/((?!_next/static|_next/image|favicon.ico|icon|apple-icon|manifest.webmanifest|robots.txt|sitemap.xml|sw.js|.*\\.(?:svg|png|jpg|jpeg|webp|ico|woff2?)$).*)',
   ],
 };

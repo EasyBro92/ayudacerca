@@ -21,7 +21,7 @@ Leyenda: ✅ hecho · 🟡 parcial · ⬜ pendiente. Especificación completa en
 - Tipos: ✅ (3 paquetes, TypeScript estricto) · Lint: ✅
 - Unitarias: ✅ 190 (núcleo, 100 % de líneas)
 - Base de datos (pgTAP): ✅ 41
-- E2E web (Playwright, móvil + escritorio, axe): ✅ 40
+- E2E web (Playwright, móvil + escritorio, axe), contra la build de producción: ✅ 40
 - E2E app (exportación web): ✅ 5
 - Compilación Android e iOS (Hermes): ✅
 
