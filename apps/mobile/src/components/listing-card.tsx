@@ -2,10 +2,11 @@ import { approximateDistance, formatPrice, formatRelativeDate } from '@ayudacerc
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { BadgeCheck, MapPin, Star, Zap } from 'lucide-react-native';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useLocale, useTranslations } from 'use-intl';
 import { Avatar } from '@/components/avatar';
 import { CategoryIcon } from '@/components/category-icon';
+import { PressableScale } from '@/components/motion';
 import { AppText, Badge } from '@/components/ui';
 import type { ListingCardData } from '@/lib/data';
 import { storageUrl } from '@/lib/env';
@@ -24,11 +25,12 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const rating = listing.author.ratingCount > 0 ? `${listing.author.ratingAvg.toFixed(1).replace('.', ',')} (${t('listing.reviewsCount', { count: listing.author.ratingCount })})` : t('listing.noRatings');
 
   return (
-      <Pressable
+      <PressableScale
         onPress={() => router.push({ pathname: '/anuncio/[slug]', params: { slug: listing.slug } })}
         accessibilityRole="link"
         accessibilityLabel={`${kind}. ${listing.title}. ${price}. ${listing.municipalityName}. ${listing.author.displayName}`}
-        style={({ pressed }) => [styles.card, pressed && { opacity: 0.9 }]}
+        scaleTo={0.98}
+        style={styles.card}
       >
         <View style={styles.cover}>
           {listing.coverPath ? (
@@ -66,7 +68,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             {listing.publishedAt ? <AppText variant="caption" muted>{safeRelative(listing.publishedAt, locale)}</AppText> : null}
           </View>
         </View>
-      </Pressable>
+      </PressableScale>
   );
 }
 

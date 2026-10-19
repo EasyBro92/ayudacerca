@@ -2,13 +2,16 @@ import { DEFAULT_FILTERS, type SearchFilters, type SortOption, activeFilterCount
 import { router, useLocalSearchParams } from 'expo-router';
 import { Search, SlidersHorizontal, X } from 'lucide-react-native';
 import { useEffect, useMemo, useState } from 'react';
-import { FlatList, Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import Animated, { Extrapolation, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
 import { ListingCard } from '@/components/listing-card';
+import { FadeInItem } from '@/components/motion';
+import { ListingListSkeleton } from '@/components/skeleton';
 import { AppText, Button, CenteredState, Chip, Loading } from '@/components/ui';
 import { type CategoryItem, type ListingCardData, getCategories, getMunicipalities, searchListings } from '@/lib/data';
-import { MIN_TOUCH, colors, radius, space } from '@/lib/theme';
+import { MIN_TOUCH, colors, radius, shadow, space } from '@/lib/theme';
 
 const PAGE = 20;
 const SORT_KEYS: Record<SortOption, string> = {
@@ -74,9 +77,25 @@ export default function ExploreScreen() {
   const active = activeFilterCount(filters);
   const category = categories.find((c) => c.slug === filters.category);
 
-  const header = (
-    <View style={{ gap: space.md, paddingBottom: space.md }}>
-      <AppText variant="h1">{t('title')}</AppText>
+  // Cabecera fija: el título se desliza hacia arriba al hacer scroll y el buscador se queda visible
+  const [headerHeight, setHeaderHeight] = useState(150);
+  const [titleHeight, setTitleHeight] = useState(48);
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => { scrollY.set(e.contentOffset.y); });
+  const headerStyle = useAnimatedStyle(() => {
+    const y = scrollY.get();
+    return {
+      transform: [{ translateY: -Math.min(Math.max(y, 0), titleHeight) }],
+      shadowOpacity: interpolate(y, [titleHeight - 8, titleHeight + 16], [0, 0.08], Extrapolation.CLAMP),
+    };
+  });
+  const titleStyle = useAnimatedStyle(() => ({ opacity: interpolate(scrollY.get(), [0, titleHeight * 0.7], [1, 0], Extrapolation.CLAMP) }));
+
+  const stickyHeader = (
+    <Animated.View style={[styles.sticky, headerStyle]} onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
+      <Animated.View style={titleStyle} onLayout={(e) => setTitleHeight(e.nativeEvent.layout.height)}>
+        <AppText variant="h1" style={{ paddingBottom: space.md }}>{t('title')}</AppText>
+      </Animated.View>
       <View style={styles.searchBox}>
         <Search color={colors.inkMuted} size={22} />
         <TextInput
@@ -90,6 +109,11 @@ export default function ExploreScreen() {
           </Pressable>
         ) : null}
       </View>
+    </Animated.View>
+  );
+
+  const header = (
+    <View style={{ gap: space.md, paddingBottom: space.md }}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
         <Chip label={t('all')} selected={filters.kind === null} onPress={() => update({ kind: null })} />
         <Chip label={tKinds('offer')} selected={filters.kind === 'offer'} onPress={() => update({ kind: 'offer' })} />
@@ -117,13 +141,16 @@ export default function ExploreScreen() {
 
   return (
     <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.background }}>
-      <FlatList
+      <View style={{ flex: 1, overflow: 'hidden' }}>
+      <Animated.FlatList
         data={loading ? [] : items}
         keyExtractor={(l) => l.id}
-        renderItem={({ item }) => <ListingCard listing={item} />}
+        renderItem={({ item, index }) => <FadeInItem index={index}><ListingCard listing={item} /></FadeInItem>}
         ItemSeparatorComponent={() => <View style={{ height: space.lg }} />}
         ListHeaderComponent={header}
-        ListEmptyComponent={loading ? <Loading label={tCommon('loading')} /> : error ? (
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        ListEmptyComponent={loading ? <ListingListSkeleton count={3} /> : error ? (
           <CenteredState title={tCommon('errorTitle')} text={tCommon('errorText')} action={<Button title={tCommon('retry')} onPress={() => setNonce((n) => n + 1)} />} />
         ) : (
           <CenteredState title={t('emptyTitle')} text={t('emptyText')} action={
@@ -136,9 +163,11 @@ export default function ExploreScreen() {
         ListFooterComponent={loadingMore ? <Loading label={tCommon('loading')} /> : undefined}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
-        contentContainerStyle={{ padding: space.lg, paddingBottom: space.xxl * 2 }}
+        contentContainerStyle={{ padding: space.lg, paddingTop: headerHeight + space.md, paddingBottom: space.xxl * 2 }}
         keyboardShouldPersistTaps="handled"
       />
+      {stickyHeader}
+      </View>
       <FiltersModal
         key={showFilters ? 'abierto' : 'cerrado'}
         visible={showFilters}
@@ -233,6 +262,10 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 const styles = StyleSheet.create({
+  sticky: {
+    position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.md,
+    backgroundColor: colors.background, ...shadow, shadowOpacity: 0, elevation: 0,
+  },
   searchBox: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 56, paddingHorizontal: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: colors.border },
   searchInput: { flex: 1, fontSize: 17, color: colors.ink, minHeight: MIN_TOUCH },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.lg, paddingVertical: space.md, borderBottomWidth: 1, borderBottomColor: colors.border },

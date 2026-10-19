@@ -8,6 +8,7 @@ import { Pressable, View } from 'react-native';
 import { useFormatter, useLocale, useTranslations } from 'use-intl';
 import { Avatar } from '@/components/avatar';
 import { ListingCard } from '@/components/listing-card';
+import { FadeInItem } from '@/components/motion';
 import { Screen } from '@/components/screen';
 import { AppText, Button, Card, Chip, Notice } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
@@ -112,7 +113,7 @@ export default function AccountScreen() {
       ) : null}
 
       <AppText variant="h2">{t('account.favorites')}</AppText>
-      {favorites.length === 0 ? <AppText muted>{t('account.noFavorites')}</AppText> : favorites.map((l) => <ListingCard key={l.id} listing={l} />)}
+      {favorites.length === 0 ? <AppText muted>{t('account.noFavorites')}</AppText> : favorites.map((l, i) => <FadeInItem key={l.id} index={i}><ListingCard listing={l} /></FadeInItem>)}
 
       {languagePicker}
       {legalLinks}

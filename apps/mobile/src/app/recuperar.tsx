@@ -28,7 +28,7 @@ export default function RecoverScreen() {
   }
 
   return (
-    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: space.lg, gap: space.lg }} keyboardShouldPersistTaps="handled">
+    <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: colors.background }} contentContainerStyle={{ padding: space.lg, gap: space.lg }} keyboardShouldPersistTaps="handled">
       {sent ? <Notice tone="success">{t('auth.recoverSent')}</Notice> : (
         <>
           <AppText muted>{t('auth.recoverText')}</AppText>

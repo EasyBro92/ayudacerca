@@ -1,7 +1,9 @@
 import type { ReactNode, Ref } from 'react';
 import {
-  ActivityIndicator, Pressable, type PressableProps, StyleSheet, Text, TextInput, type TextInputInstance, type TextInputProps, type TextProps, View, type ViewProps, type ViewStyle,
+  ActivityIndicator, StyleSheet, Text, TextInput, type TextInputInstance, type TextInputProps, type TextProps, View, type ViewProps, type ViewStyle,
 } from 'react-native';
+import { PressableScale, type PressableScaleProps } from '@/components/motion';
+import { haptics } from '@/lib/haptics';
 import { MIN_TOUCH, colors, radius, shadow, space, type } from '@/lib/theme';
 
 type Variant = keyof typeof type;
@@ -20,7 +22,7 @@ export function AppText({ variant = 'body', muted = false, style, ...props }: Te
 
 type ButtonVariant = 'primary' | 'accent' | 'outline' | 'ghost' | 'danger';
 
-export function Button({ title, variant = 'primary', loading = false, icon, disabled, style, ...props }: PressableProps & {
+export function Button({ title, variant = 'primary', loading = false, icon, disabled, style, ...props }: Omit<PressableScaleProps, 'style'> & {
   title: string; variant?: ButtonVariant; loading?: boolean; icon?: ReactNode; style?: ViewStyle;
 }) {
   const palette = {
@@ -28,24 +30,24 @@ export function Button({ title, variant = 'primary', loading = false, icon, disa
     accent: { bg: colors.accent, fg: colors.onAccent, border: colors.accent },
     outline: { bg: colors.surface, fg: colors.primary, border: colors.primary },
     ghost: { bg: 'transparent', fg: colors.ink, border: 'transparent' },
-    danger: { bg: colors.danger, fg: '#FFFFFF', border: colors.danger },
+    danger: { bg: colors.danger, fg: colors.onPrimary, border: colors.danger },
   }[variant];
   const isDisabled = disabled || loading;
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ disabled: !!isDisabled, busy: loading }}
       disabled={isDisabled}
-      style={({ pressed }) => [
+      style={[
         styles.button,
-        { backgroundColor: isDisabled ? colors.surfaceMuted : palette.bg, borderColor: isDisabled ? colors.border : palette.border, opacity: pressed ? 0.85 : 1 },
+        { backgroundColor: isDisabled ? colors.surfaceMuted : palette.bg, borderColor: isDisabled ? colors.border : palette.border },
         style,
       ]}
       {...props}
     >
       {loading ? <ActivityIndicator color={palette.fg} /> : icon}
       <Text maxFontSizeMultiplier={1.6} style={[styles.buttonText, { color: isDisabled ? colors.inkMuted : palette.fg }]}>{title}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -98,16 +100,18 @@ export function Notice({ tone = 'info', title, children }: { tone?: 'info' | 'wa
   );
 }
 
-export function Chip({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+export function Chip({ label, selected, onPress, icon }: { label: string; selected: boolean; onPress: () => void; icon?: ReactNode }) {
   return (
-    <Pressable
+    <PressableScale
       accessibilityRole="button"
       accessibilityState={{ selected }}
-      onPress={onPress}
+      onPress={() => { if (!selected) haptics.selection(); onPress(); }}
+      scaleTo={0.95}
       style={[styles.chip, selected ? { backgroundColor: colors.primary, borderColor: colors.primary } : null]}
     >
+      {icon}
       <Text maxFontSizeMultiplier={1.6} style={{ fontWeight: '700', color: selected ? colors.onPrimary : colors.ink }}>{label}</Text>
-    </Pressable>
+    </PressableScale>
   );
 }
 
@@ -131,7 +135,7 @@ export function Loading({ label }: { label: string }) {
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: MIN_TOUCH, paddingHorizontal: space.lg, borderRadius: radius.md, borderWidth: 2,
+    minHeight: MIN_TOUCH + 2, paddingHorizontal: space.lg, borderRadius: radius.md, borderWidth: 2,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.sm,
   },
   buttonText: { fontSize: 17, fontWeight: '700' },
@@ -143,8 +147,8 @@ const styles = StyleSheet.create({
   },
   notice: { padding: space.lg, borderRadius: radius.md, gap: space.xs },
   chip: {
-    minHeight: 44, paddingHorizontal: space.lg, borderRadius: radius.full, borderWidth: 2, borderColor: colors.border,
-    backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center',
+    minHeight: 44, paddingHorizontal: space.lg, borderRadius: radius.full, borderWidth: 1.5, borderColor: colors.border,
+    backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: space.xs,
   },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.md },
 });

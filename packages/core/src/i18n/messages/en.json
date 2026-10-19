@@ -157,7 +157,7 @@
     "title": "Explore",
     "heading": "Find help or people to help",
     "results": "{count, plural, =0 {No results} one {# result} other {# results}}",
-    "searchPlaceholder": "Search a service: cleaning, guitar, Wi-Fi…",
+    "searchPlaceholder": "E.g. set up Wi-Fi, build a website, Excel…",
     "filters": "Filters",
     "filtersWithCount": "Filters ({count})",
     "clearFilters": "Clear filters",

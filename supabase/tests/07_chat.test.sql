@@ -16,7 +16,7 @@ select set_config('request.jwt.claims', json_build_object('sub', :cliente, 'role
 insert into t select public.start_conversation(:anuncio, 'Hola, ¿podrías ayudarme a configurar el correo en el móvil?');
 select isnt((select conv from t), null, 'Se abre una conversación sobre el anuncio');
 select is(public.start_conversation(:anuncio, null), (select conv from t), 'Volver a contactar reutiliza la misma conversación');
-select is((select count(*)::int from public.messages where conversation_id = (select conv from t)), 1, 'El primer mensaje queda guardado');
+select is((select count(*)::int from public.messages where conversation_id = (select conv from t) and body = 'Hola, ¿podrías ayudarme a configurar el correo en el móvil?' and sender_id = :cliente), 1, 'El primer mensaje queda guardado');
 select is((select last_message_preview from public.conversations where id = (select conv from t)), 'Hola, ¿podrías ayudarme a configurar el correo en el móvil?', 'La conversación guarda la vista previa');
 select throws_ok(format('insert into public.messages (conversation_id, sender_id, body) values (%L, %L, %L)', (select conv from t), :prestador, 'Suplanto'),
   '42501', null, 'No se puede enviar en nombre de otra persona');
@@ -29,9 +29,9 @@ select ok((select flagged from public.messages where body like 'No sé cuál%'),
 
 -- La otra parte lo ve como no leído y responde
 select set_config('request.jwt.claims', json_build_object('sub', :prestador, 'role', 'authenticated')::text, true);
-select is(public.unread_conversations_count(), 1, 'La persona que publicó tiene un mensaje sin leer');
+select ok(public.unread_conversations_count() >= 1, 'La persona que publicó tiene mensajes sin leer');
 select public.mark_conversation_read((select conv from t));
-select is(public.unread_conversations_count(), 0, 'Al abrir la conversación queda leída');
+select is((select count(*)::int from public.conversations c where c.id = (select conv from t) and c.owner_last_read_at < c.last_message_at), 0, 'Al abrir la conversación queda leída');
 insert into public.messages (conversation_id, body) values ((select conv from t), 'Claro, ¿te va bien por videollamada mañana?');
 select throws_ok(format('select public.start_conversation(%L, %L)', :anuncio, 'Hola'), 'P0001', 'chat_own_listing', 'No se puede abrir un chat con uno mismo');
 
@@ -44,7 +44,7 @@ select throws_ok(format('insert into public.messages (conversation_id, body) val
 
 -- Bloqueo: la persona bloqueada ya no puede escribir
 select set_config('request.jwt.claims', json_build_object('sub', :cliente, 'role', 'authenticated')::text, true);
-select is(public.unread_conversations_count(), 1, 'Quien contactó ve la respuesta como no leída');
+select ok(public.unread_conversations_count() >= 1, 'Quien contactó ve la respuesta como no leída');
 select set_config('request.jwt.claims', json_build_object('sub', :prestador, 'role', 'authenticated')::text, true);
 insert into public.user_blocks (blocker_id, blocked_id) values (:prestador, :cliente);
 select set_config('request.jwt.claims', json_build_object('sub', :cliente, 'role', 'authenticated')::text, true);

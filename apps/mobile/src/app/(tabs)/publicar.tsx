@@ -9,14 +9,17 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { CheckCircle2, ImagePlus, Trash2 } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, type ScrollViewInstance, StyleSheet, Switch, TextInput, View } from 'react-native';
+import Animated, { useAnimatedStyle, useReducedMotion, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
 import { CategoryIcon } from '@/components/category-icon';
+import { FadeInItem, PressableScale } from '@/components/motion';
 import { Screen } from '@/components/screen';
 import { AppText, Button, Chip, Loading, Notice, TextField } from '@/components/ui';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { storageUrl } from '@/lib/env';
+import { haptics } from '@/lib/haptics';
 import { type DraftData, type DraftImage, type WizardCategory, getOrCreateDraft, loadWizardCatalog, saveDraft } from '@/lib/publish-data';
 import { MIN_TOUCH, colors, radius, space } from '@/lib/theme';
 
@@ -124,7 +127,7 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   function go(next: number) {
     if (next > step) {
       const e = validate(step);
-      if (Object.keys(e).length) { setErrors(e); return; }
+      if (Object.keys(e).length) { setErrors(e); haptics.error(); return; }
     }
     setErrors({});
     setStep(next);
@@ -157,15 +160,16 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   }
 
   async function submit() {
-    if (!confirmed) { setErrors({ confirm: 'mustConfirm' }); return; }
-    for (const s of [1, 2, 3, 4, 6]) { const e = validate(s); if (Object.keys(e).length) { setErrors(e); setStep(s); return; } }
+    if (!confirmed) { setErrors({ confirm: 'mustConfirm' }); haptics.error(); return; }
+    for (const s of [1, 2, 3, 4, 6]) { const e = validate(s); if (Object.keys(e).length) { setErrors(e); setStep(s); haptics.error(); return; } }
     setSubmitting(true);
     setNotice(null);
     await saveDraft(draftId!, data, TOTAL).catch(() => undefined);
     const r = await api<{ status: 'published' | 'pending_review'; slug: string }>(`/drafts/${draftId}/submit`, { method: 'POST' });
     setSubmitting(false);
-    if (r.ok) setResult(r.data);
-    else if (['emailRequired', 'verificationRequired', 'rejectedText'].includes(r.error.message)) setNotice(t(`publish.${r.error.message}` as 'publish.emailRequired'));
+    if (r.ok) { haptics.success(); setResult(r.data); return; }
+    haptics.error();
+    if (['emailRequired', 'verificationRequired', 'rejectedText'].includes(r.error.message)) setNotice(t(`publish.${r.error.message}` as 'publish.emailRequired'));
     else if (r.error.fieldErrors) { setErrors(r.error.fieldErrors); setNotice(t('publish.fixErrors')); }
     else setNotice(t(`errors.${r.error.code}`));
   }
@@ -173,7 +177,7 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   if (result) {
     return (
       <Screen>
-        <CheckCircle2 size={56} color={colors.success} />
+        <FadeInItem><CheckCircle2 size={56} color={colors.success} /></FadeInItem>
         <AppText variant="h1">{result.status === 'published' ? t('publish.publishedTitle') : t('publish.pendingTitle')}</AppText>
         <AppText muted>{result.status === 'published' ? t('publish.publishedText') : t('publish.pendingText')}</AppText>
         {result.status === 'published' ? <Button title={t('publish.viewListing')} onPress={() => router.push({ pathname: '/anuncio/[slug]', params: { slug: result.slug } })} /> : null}
@@ -195,7 +199,7 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
         <View style={styles.progressWrap}>
           <AppText variant="small" style={{ fontWeight: '700' }}>{t('publish.progress', { step, total: TOTAL, name: stepName })}</AppText>
           <View style={styles.progressTrack} accessibilityRole="progressbar" accessibilityValue={{ min: 1, max: TOTAL, now: step }}>
-            <View style={[styles.progressFill, { width: `${(step / TOTAL) * 100}%` }]} />
+            <ProgressFill fraction={step / TOTAL} />
           </View>
         </View>
         <ScrollView ref={scrollRef} contentContainerStyle={{ padding: space.lg, gap: space.lg, paddingBottom: space.xxl * 3 }} keyboardShouldPersistTaps="handled">
@@ -216,11 +220,12 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
               <AppText variant="h1">{t('publish.q2')}</AppText>
               <View style={{ gap: space.sm }}>
                 {catalog.categories.map((c) => (
-                  <Pressable key={c.id} accessibilityRole="radio" accessibilityState={{ checked: data.categoryId === c.id }} onPress={() => update({ categoryId: c.id, subcategoryId: null, customValues: {} })}
+                  <PressableScale key={c.id} accessibilityRole="radio" accessibilityState={{ checked: data.categoryId === c.id }} scaleTo={0.98}
+                    onPress={() => { if (data.categoryId !== c.id) haptics.selection(); update({ categoryId: c.id, subcategoryId: null, customValues: {} }); }}
                     style={[styles.option, { flexDirection: 'row', alignItems: 'center', gap: space.md }, data.categoryId === c.id && styles.optionSelected]}>
                     <CategoryIcon icon={c.icon} color={c.color} size={40} />
                     <AppText style={{ fontWeight: '700', flex: 1 }}>{c.name}</AppText>
-                  </Pressable>
+                  </PressableScale>
                 ))}
               </View>
               {category && category.subcategories.length ? (
@@ -398,12 +403,27 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   );
 }
 
+/** Barra de progreso que avanza con un muelle suave entre pasos. */
+function ProgressFill({ fraction }: { fraction: number }) {
+  const reduced = useReducedMotion();
+  const [width, setWidth] = useState(0);
+  const style = useAnimatedStyle(() => {
+    const target = width * fraction;
+    return { width: reduced || width === 0 ? target : withSpring(target, { damping: 20, stiffness: 160 }) };
+  }, [width, fraction, reduced]);
+  return (
+    <View style={StyleSheet.absoluteFill} onLayout={(e) => setWidth(e.nativeEvent.layout.width)}>
+      <Animated.View style={[styles.progressFill, style, width === 0 && { width: `${fraction * 100}%` }]} />
+    </View>
+  );
+}
+
 function Option({ selected, onPress, title, text }: { selected: boolean; onPress: () => void; title: string; text: string }) {
   return (
-    <Pressable accessibilityRole="radio" accessibilityState={{ checked: selected }} onPress={onPress} style={[styles.option, selected && styles.optionSelected]}>
+    <PressableScale accessibilityRole="radio" accessibilityState={{ checked: selected }} onPress={() => { if (!selected) haptics.selection(); onPress(); }} scaleTo={0.98} style={[styles.option, selected && styles.optionSelected]}>
       <AppText variant="h3">{title}</AppText>
       <AppText muted>{text}</AppText>
-    </Pressable>
+    </PressableScale>
   );
 }
 

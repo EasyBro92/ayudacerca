@@ -6,6 +6,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useTranslations } from 'use-intl';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { I18nProvider } from '@/lib/i18n';
+import { UnreadProvider } from '@/lib/unread';
 import { colors } from '@/lib/theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -23,13 +24,16 @@ function RootStack() {
         headerTitleStyle: { color: colors.ink, fontWeight: '700' },
         contentStyle: { backgroundColor: colors.background },
         headerBackButtonDisplayMode: 'minimal',
+        headerShadowVisible: false,
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="anuncio/[slug]" options={{ title: '' }} />
-      <Stack.Screen name="entrar" options={{ title: t('auth.signInTitle'), presentation: 'modal' }} />
-      <Stack.Screen name="registro" options={{ title: t('auth.signUpTitle'), presentation: 'modal' }} />
-      <Stack.Screen name="recuperar" options={{ title: t('auth.recoverTitle'), presentation: 'modal' }} />
+      <Stack.Screen name="conversacion/[id]" options={{ title: t('chat.title') }} />
+      {/* Hojas modales con título grande, como los ajustes de iOS */}
+      <Stack.Screen name="entrar" options={{ title: t('auth.signInTitle'), presentation: 'modal', headerLargeTitle: true }} />
+      <Stack.Screen name="registro" options={{ title: t('auth.signUpTitle'), presentation: 'modal', headerLargeTitle: true }} />
+      <Stack.Screen name="recuperar" options={{ title: t('auth.recoverTitle'), presentation: 'modal', headerLargeTitle: true }} />
     </Stack>
   );
 }
@@ -39,8 +43,10 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <I18nProvider>
         <AuthProvider>
-          <StatusBar style="dark" />
-          <RootStack />
+          <UnreadProvider>
+            <StatusBar style="dark" />
+            <RootStack />
+          </UnreadProvider>
         </AuthProvider>
       </I18nProvider>
     </SafeAreaProvider>

@@ -56,7 +56,7 @@ export default function SignUpScreen() {
   }
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView contentContainerStyle={{ padding: space.lg, gap: space.lg }} keyboardShouldPersistTaps="handled">
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: space.lg, gap: space.lg }} keyboardShouldPersistTaps="handled">
         <AppText muted>{t('auth.signUpSubtitle')}</AppText>
         {formError ? <Notice tone="danger">{formError}</Notice> : null}
         <TextField label={t('auth.displayName')} help={t('auth.displayNameHelp')} value={displayName} onChangeText={setDisplayName} autoComplete="nickname" maxLength={40} error={err('displayName')} />

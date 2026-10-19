@@ -19,10 +19,20 @@ export const type = {
 /** Área táctil mínima (WCAG 2.5.8 y guías de Apple/Google). */
 export const MIN_TOUCH = 48;
 
+/** Sombra suave para tarjetas (iOS) y elevación equivalente (Android). */
 export const shadow = {
-  shadowColor: '#161A2E',
-  shadowOpacity: 0.08,
-  shadowRadius: 8,
-  shadowOffset: { width: 0, height: 2 },
+  shadowColor: colors.ink,
+  shadowOpacity: 0.07,
+  shadowRadius: 12,
+  shadowOffset: { width: 0, height: 4 },
   elevation: 2,
+} as const;
+
+/** Sombra más marcada para elementos flotantes (barras inferiores, cabeceras al hacer scroll). */
+export const shadowRaised = {
+  shadowColor: colors.ink,
+  shadowOpacity: 0.1,
+  shadowRadius: 16,
+  shadowOffset: { width: 0, height: -2 },
+  elevation: 8,
 } as const;

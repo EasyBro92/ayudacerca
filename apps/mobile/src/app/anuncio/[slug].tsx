@@ -1,22 +1,25 @@
 import { brand, formatPrice, formatRelativeDate, localized } from '@ayudacerca/core';
 import { Image } from 'expo-image';
-import { Stack, useLocalSearchParams } from 'expo-router';
-import { BadgeCheck, Briefcase, Info, MapPin, MessageCircle, Share2, ShieldAlert, Star } from 'lucide-react-native';
+import { Stack, router, useLocalSearchParams } from 'expo-router';
+import { BadgeCheck, Briefcase, FileText, Info, MapPin, MessageCircle, Share2, ShieldAlert, Star } from 'lucide-react-native';
+import { useEffect, useState } from 'react';
 import { Dimensions, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFormatter, useLocale, useTranslations } from 'use-intl';
 import { Avatar } from '@/components/avatar';
 import { CategoryIcon } from '@/components/category-icon';
+import { ContactSheet } from '@/components/contact-sheet';
 import { FavoriteButton } from '@/components/favorite-button';
+import { FadeInItem } from '@/components/motion';
 import { ReportSheet } from '@/components/report-sheet';
-import { AppText, Badge, Button, Card, CenteredState, Loading, Notice } from '@/components/ui';
+import { DetailSkeleton } from '@/components/skeleton';
+import { AppText, Badge, Button, Card, CenteredState, Notice } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
+import { getMyConversationForListing } from '@/lib/chat';
 import { getListing } from '@/lib/data';
 import { storageUrl, webUrl } from '@/lib/env';
-import { colors, space } from '@/lib/theme';
+import { colors, radius, shadowRaised, space } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
-
-const CHAT_AVAILABLE = false; // llega en la fase 4
 
 export default function ListingScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -25,8 +28,21 @@ export default function ListingScreen() {
   const format = useFormatter();
   const { session } = useAuth();
   const { data: listing, loading, error, reload } = useAsync(() => getListing(slug), [slug]);
+  const userId = session?.user.id ?? null;
+  const listingId = listing?.id ?? null;
+  const [existing, setExisting] = useState<{ key: string; id: string | null } | null>(null);
+  const [contactOpen, setContactOpen] = useState(false);
 
-  if (loading) return <Loading label={t('common.loading')} />;
+  // ¿Ya le escribí sobre este anuncio? Entonces se ofrece «Ver la conversación»
+  useEffect(() => {
+    if (!userId || !listingId) return;
+    let cancelled = false;
+    getMyConversationForListing(listingId, userId).then((id) => { if (!cancelled) setExisting({ key: `${userId}:${listingId}`, id }); }, () => undefined);
+    return () => { cancelled = true; };
+  }, [userId, listingId, contactOpen]);
+  const existingId = existing?.key === `${userId}:${listingId}` ? existing.id : null;
+
+  if (loading) return <DetailSkeleton />;
   if (error) return <CenteredState title={t('common.errorTitle')} text={t('common.errorText')} action={<Button title={t('common.retry')} onPress={reload} />} />;
   if (!listing) return <CenteredState title={t('listing.removedTitle')} text={t('listing.removedText')} />;
 
@@ -38,6 +54,12 @@ export default function ListingScreen() {
   const width = Dimensions.get('window').width;
   const statusNotice = ({ paused: 'statusPaused', reserved: 'statusReserved', completed: 'statusCompleted', expired: 'statusExpired' } as const)[listing.status as 'paused'];
   const share = () => Share.share({ message: `${listing.title} · ${brand.name}\n${webUrl(`/anuncios/${listing.slug}`, locale)}` });
+  const contactable = listing.status === 'published';
+  const contact = () => {
+    if (existingId) { router.push({ pathname: '/conversacion/[id]', params: { id: existingId } }); return; }
+    if (!session) { router.push({ pathname: '/entrar', params: { next: `/anuncio/${listing.slug}` } }); return; }
+    setContactOpen(true);
+  };
 
   return (
     <SafeAreaView edges={['bottom']} style={{ flex: 1, backgroundColor: colors.background }}>
@@ -56,7 +78,7 @@ export default function ListingScreen() {
           </View>
         )}
 
-        <View style={{ padding: space.lg, gap: space.lg }}>
+        <FadeInItem style={{ padding: space.lg, gap: space.lg }}>
           {isOwner ? <Notice>{t('listing.ownListing')}</Notice> : null}
           {statusNotice ? <Notice tone="warning">{t(`listing.${statusNotice}`)}</Notice> : null}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
@@ -94,6 +116,13 @@ export default function ListingScreen() {
             {(['safetyTip1', 'safetyTip2', 'safetyTip3'] as const).map((k) => <AppText key={k}>• {t(`listing.${k}`)}</AppText>)}
           </View>
 
+          {!isOwner ? (
+            <View style={styles.proposal}>
+              <Button title={t('listing.requestProposal')} variant="outline" disabled icon={<FileText size={20} color={colors.inkMuted} />} />
+              <AppText variant="small" muted>{t('listing.contactSoon')}</AppText>
+            </View>
+          ) : null}
+
           <Card style={{ padding: space.lg, gap: space.md }}>
             <AppText variant="caption" muted style={{ fontWeight: '700', textTransform: 'uppercase' }}>{t('listing.postedBy')}</AppText>
             <View style={[styles.row, { gap: space.md }]}>
@@ -128,18 +157,26 @@ export default function ListingScreen() {
             <Button title={t('listing.share')} variant="ghost" icon={<Share2 size={20} color={colors.ink} />} onPress={share} />
             {!isOwner ? <ReportSheet listingId={listing.id} /> : null}
           </View>
-        </View>
+        </FadeInItem>
       </ScrollView>
 
       {!isOwner ? (
         <View style={styles.bar}>
           <View style={{ flex: 1 }}>
             <AppText variant="h3" numberOfLines={1}>{price}</AppText>
-            <AppText variant="caption" muted numberOfLines={2}>{t('listing.contactSoon')}</AppText>
+            {!session ? <AppText variant="caption" muted numberOfLines={2}>{t('listing.actionsRequireAccount')}</AppText> : null}
           </View>
           <FavoriteButton listingId={listing.id} title={listing.title} />
-          <Button title={t('listing.contact')} disabled={!CHAT_AVAILABLE} icon={<MessageCircle size={20} color={colors.inkMuted} />} />
+          {existingId ? (
+            <Button title={t('chat.openConversation')} variant="outline" icon={<MessageCircle size={20} color={colors.primary} />} onPress={contact} />
+          ) : (
+            <Button title={t('listing.contact')} disabled={!contactable} icon={<MessageCircle size={20} color={contactable ? colors.onPrimary : colors.inkMuted} />} onPress={contact} />
+          )}
         </View>
+      ) : null}
+      {!isOwner && session ? (
+        <ContactSheet visible={contactOpen} onClose={() => setContactOpen(false)} listingId={listing.id} listingTitle={listing.title}
+          authorName={listing.author.display_name} authorAvatar={listing.author.avatar_path} />
       ) : null}
     </SafeAreaView>
   );
@@ -152,9 +189,11 @@ function safeRelative(date: string, locale: string) {
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
   noPhoto: { aspectRatio: 16 / 9, alignItems: 'center', justifyContent: 'center' },
-  tips: { backgroundColor: colors.primarySoft, borderRadius: 16, padding: space.lg, gap: space.sm },
+  tips: { backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  proposal: { gap: space.xs },
   bar: {
     position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center', gap: space.sm,
-    padding: space.md, paddingBottom: space.xl, backgroundColor: colors.surface, borderTopWidth: 1, borderTopColor: colors.border,
+    padding: space.md, paddingBottom: space.xl, backgroundColor: colors.surface, borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl,
+    ...shadowRaised,
   },
 });
