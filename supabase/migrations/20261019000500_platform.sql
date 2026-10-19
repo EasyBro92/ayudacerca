@@ -82,3 +82,5 @@ grant execute on function private.set_updated_at() to anon, authenticated;
 grant execute on function private.prevent_mutation() to anon, authenticated;
 grant execute on function private.is_valid_i18n(jsonb) to anon, authenticated;
 revoke all on all tables in schema private from anon, authenticated;
+-- El servidor (service_role) sí puede ejecutar todas las utilidades internas
+grant execute on all functions in schema private to service_role;

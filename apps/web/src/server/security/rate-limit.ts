@@ -25,3 +25,9 @@ export function rateLimit(key: string, limit: number, windowMs: number): { ok: b
 export function resetRateLimit(key: string): void {
   buckets.delete(key);
 }
+
+/** Devuelve el último intento consumido (para contar solo los intentos fallidos). */
+export function refundRateLimit(key: string): void {
+  const hits = buckets.get(key);
+  if (hits && hits.length > 0) hits.pop();
+}

@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   transpilePackages: ['@ayudacerca/core'],
+  experimental: {
+    // Fotos de hasta 10 MB (más el margen del multipart). El servidor vuelve a validar tamaño y tipo.
+    serverActions: { bodySizeLimit: '11mb' },
+  },
   images: {
     remotePatterns: [
       { protocol: supabaseUrl.protocol.replace(':', '') as 'http' | 'https', hostname: supabaseUrl.hostname, port: supabaseUrl.port, pathname: '/storage/v1/object/public/**' },

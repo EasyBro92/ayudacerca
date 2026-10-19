@@ -192,6 +192,28 @@ insert into public.platform_settings (key, value, description, is_public) values
 insert into public.platform_settings (key, value, description, is_public) values ('app.min_version', '{"ios":"1.0.0","android":"1.0.0"}'::jsonb, 'Versión mínima de la app; por debajo se pide actualizar', true) on conflict (key) do nothing;
 insert into public.platform_settings (key, value, description, is_public) values ('legal.current_versions', '{"terms":"2026-10-borrador","privacy":"2026-10-borrador","cookies":"2026-10-borrador"}'::jsonb, 'Versiones vigentes que se aceptan al registrarse', true) on conflict (key) do nothing;
 
+-- Términos que envían un anuncio a revisión manual (lista inicial, ampliable desde administración)
+insert into public.blocked_terms (term, action) values ('contraseña', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('contrasena', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('certificado digital', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('clave pin', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('cl@ve', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('código sms', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('suplantar', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('hacerme pasar', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('arma', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('droga', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('marihuana', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('cocaína', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('robado', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('préstamo rápido', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('criptomoneda', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('masaje erótico', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('escort', 'reject') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('receta médica', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('instalación de gas', 'review') on conflict (term) do nothing;
+insert into public.blocked_terms (term, action) values ('boletín eléctrico', 'review') on conflict (term) do nothing;
+
 -- Documentos legales (BORRADORES pendientes de revisión jurídica)
 insert into public.legal_documents (kind, version, locale, title, body_md, is_draft, published_at) values ('cancellations', '2026-10-borrador', 'es', 'Política de cancelación (ejemplo inicial)', '# Política de cancelación (ejemplo inicial)
 

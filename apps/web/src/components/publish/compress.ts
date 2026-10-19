@@ -1,0 +1,20 @@
+/**
+ * Reduce la foto en el navegador antes de subirla (menos datos móviles y subidas más rápidas).
+ * Si el navegador no sabe decodificarla (p. ej. HEIC fuera de Safari), se envía tal cual y la procesa el servidor.
+ * El servidor SIEMPRE vuelve a validar, limpiar metadatos y recomprimir.
+ */
+export async function compressImage(file: File, maxSide = 2000): Promise<Blob> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1 && file.size < 2 * 1024 * 1024) return file;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext('2d')?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.85));
+    return blob ?? file;
+  } catch {
+    return file;
+  }
+}

@@ -18,7 +18,7 @@ as $$ select coalesce(array_to_string(tags, ' '), '') $$;
 
 create table public.listings (
   id                 uuid primary key default gen_random_uuid(),
-  slug               text not null unique,
+  slug               text not null unique default '', -- lo genera el trigger
   author_id          uuid not null references public.profiles (id) on delete cascade,
   kind               public.listing_kind not null,
   title              text not null check (char_length(title) between 10 and 80),

@@ -26,6 +26,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"blocked_terms": {
+                  Row: {
+                    "action": string,"created_at": string,"id": number,"term": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "action"?: string,"created_at"?: string,"id"?: never,"term": string
+                  }
+                  Update: {
+                    "action"?: string,"created_at"?: string,"id"?: never,"term"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"categories": {
                   Row: {
                     "allow_photos": boolean,"color": string,"created_at": string,"description": NonNullable<Json>,"icon": string,"id": number,"image_path": string | null,"is_active": boolean,"is_sensitive": boolean,"name": NonNullable<Json>,"required_verifications": (Database["public"]['Enums']["verification_kind"])[],"requires_review": boolean,"restrictions": Json | null,"slug": string,"sort_order": number,"updated_at": string,"warnings": Json | null
@@ -134,6 +148,26 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"listing_drafts": {
+                  Row: {
+                    "author_id": string,"created_at": string,"data": NonNullable<Json>,"id": string,"step": number,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "author_id": string,"created_at"?: string,"data"?: NonNullable<Json>,"id"?: string,"step"?: number,"updated_at"?: string
+                  }
+                  Update: {
+                    "author_id"?: string,"created_at"?: string,"data"?: NonNullable<Json>,"id"?: string,"step"?: number,"updated_at"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "listing_drafts_author_id_fkey"
+      columns: ["author_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"listing_favorites": {
                   Row: {
                     "created_at": string,"listing_id": string,"user_id": string
@@ -238,7 +272,7 @@ isOneToOne: false
                   }
                   ComputedFields: never
                   Insert: {
-                    "author_id": string,"availability"?: Json | null,"category_id": number,"contacts_count"?: number,"created_at"?: string,"currency"?: string,"deleted_at"?: string | null,"description": string,"desired_date"?: string | null,"expires_at"?: string | null,"favorites_count"?: number,"id"?: string,"is_urgent"?: boolean,"kind": Database["public"]['Enums']["listing_kind"],"location_public"?: unknown,"modality": Database["public"]['Enums']["listing_modality"],"moderation_reason"?: string | null,"moderation_status"?: Database["public"]['Enums']["moderation_status"],"municipality_id": number,"price_cents"?: number | null,"price_type": Database["public"]['Enums']["price_type"],"published_at"?: string | null,"radius_km"?: number | null,"requirements"?: string | null,"safety_notes"?: string | null,"search_vector"?: never,"slug": string,"status"?: Database["public"]['Enums']["listing_status"],"subcategory_id"?: number | null,"tags"?: (string)[],"title": string,"updated_at"?: string,"views_count"?: number,"visibility"?: Database["public"]['Enums']["listing_visibility"]
+                    "author_id": string,"availability"?: Json | null,"category_id": number,"contacts_count"?: number,"created_at"?: string,"currency"?: string,"deleted_at"?: string | null,"description": string,"desired_date"?: string | null,"expires_at"?: string | null,"favorites_count"?: number,"id"?: string,"is_urgent"?: boolean,"kind": Database["public"]['Enums']["listing_kind"],"location_public"?: unknown,"modality": Database["public"]['Enums']["listing_modality"],"moderation_reason"?: string | null,"moderation_status"?: Database["public"]['Enums']["moderation_status"],"municipality_id": number,"price_cents"?: number | null,"price_type": Database["public"]['Enums']["price_type"],"published_at"?: string | null,"radius_km"?: number | null,"requirements"?: string | null,"safety_notes"?: string | null,"search_vector"?: never,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"subcategory_id"?: number | null,"tags"?: (string)[],"title": string,"updated_at"?: string,"views_count"?: number,"visibility"?: Database["public"]['Enums']["listing_visibility"]
                   }
                   Update: {
                     "author_id"?: string,"availability"?: Json | null,"category_id"?: number,"contacts_count"?: number,"created_at"?: string,"currency"?: string,"deleted_at"?: string | null,"description"?: string,"desired_date"?: string | null,"expires_at"?: string | null,"favorites_count"?: number,"id"?: string,"is_urgent"?: boolean,"kind"?: Database["public"]['Enums']["listing_kind"],"location_public"?: unknown,"modality"?: Database["public"]['Enums']["listing_modality"],"moderation_reason"?: string | null,"moderation_status"?: Database["public"]['Enums']["moderation_status"],"municipality_id"?: number,"price_cents"?: number | null,"price_type"?: Database["public"]['Enums']["price_type"],"published_at"?: string | null,"radius_km"?: number | null,"requirements"?: string | null,"safety_notes"?: string | null,"search_vector"?: never,"slug"?: string,"status"?: Database["public"]['Enums']["listing_status"],"subcategory_id"?: number | null,"tags"?: (string)[],"title"?: string,"updated_at"?: string,"views_count"?: number,"visibility"?: Database["public"]['Enums']["listing_visibility"]

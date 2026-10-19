@@ -113,6 +113,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
 
       <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_22rem]">
         <article className="flex min-w-0 flex-col gap-6">
+          {isOwner ? <Alert className="lg:hidden">{t('ownListing')}</Alert> : null}
           {statusNotice ? <Alert variant="warning">{statusNotice}</Alert> : null}
           {images.length > 0 ? (
             <Gallery images={images} title={listing.title} />

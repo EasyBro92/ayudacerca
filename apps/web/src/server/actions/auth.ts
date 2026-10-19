@@ -9,7 +9,7 @@ import { publicEnv } from '@/config/env';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { localizedPath } from '@/lib/seo';
 import { log } from '@/server/log';
-import { rateLimit, resetRateLimit } from '@/server/security/rate-limit';
+import { rateLimit, refundRateLimit, resetRateLimit } from '@/server/security/rate-limit';
 import { clientIpTruncated } from '@/server/security/request';
 
 export interface AuthFormState {
@@ -53,7 +53,9 @@ export async function signInAction(_: AuthFormState, form: FormData): Promise<Au
     log('info', 'auth.signin_failed', { code: error.code });
     return { status: 'error', message: mapAuthError(error.code), values };
   }
+  // Un acceso correcto no cuenta como intento: solo limitamos los fallos
   resetRateLimit(`signin:email:${parsed.data.email}`);
+  refundRateLimit(`signin:ip:${ip}`);
   const locale = localeOf(form);
   redirect(localizedPath(safeRedirectPath(form.get('volver'), '/cuenta'), locale));
 }

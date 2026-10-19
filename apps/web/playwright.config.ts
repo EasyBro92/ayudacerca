@@ -19,7 +19,5 @@ export default defineConfig({
     { name: 'movil', use: { ...devices['Pixel 7'] } },
     { name: 'escritorio', use: { ...devices['Desktop Chrome'] } },
   ],
-  webServer: process.env.E2E_BASE_URL
-    ? undefined
-    : { command: 'pnpm start', url: baseURL, reuseExistingServer: true, timeout: 180_000 },
+  ...(process.env.E2E_BASE_URL ? {} : { webServer: { command: 'pnpm start', url: baseURL, reuseExistingServer: true, timeout: 180_000 } }),
 });

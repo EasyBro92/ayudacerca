@@ -69,6 +69,15 @@ for (const [key, value, description, isPublic] of settings) {
   req.push(`insert into public.platform_settings (key, value, description, is_public) values (${q(key)}, ${j(value)}, ${q(description)}, ${isPublic}) on conflict (key) do nothing;`);
 }
 
+req.push('\n-- Términos que envían un anuncio a revisión manual (lista inicial, ampliable desde administración)');
+const terms = [
+  ['contraseña', 'review'], ['contrasena', 'review'], ['certificado digital', 'review'], ['clave pin', 'review'], ['cl@ve', 'review'],
+  ['código sms', 'review'], ['suplantar', 'reject'], ['hacerme pasar', 'reject'], ['arma', 'review'], ['droga', 'review'],
+  ['marihuana', 'reject'], ['cocaína', 'reject'], ['robado', 'reject'], ['préstamo rápido', 'review'], ['criptomoneda', 'review'],
+  ['masaje erótico', 'reject'], ['escort', 'reject'], ['receta médica', 'review'], ['instalación de gas', 'review'], ['boletín eléctrico', 'review'],
+];
+for (const [term, action] of terms) req.push(`insert into public.blocked_terms (term, action) values (${q(term)}, ${q(action)}) on conflict (term) do nothing;`);
+
 req.push('\n-- Documentos legales (BORRADORES pendientes de revisión jurídica)');
 const legalDir = join(root, 'docs/legal');
 for (const file of readdirSync(legalDir).filter((f) => /^[a-z_]+\.(es|ca|en)\.md$/.test(f)).sort()) {
