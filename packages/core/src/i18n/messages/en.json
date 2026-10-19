@@ -28,7 +28,9 @@
     "notFoundTitle": "We can’t find this page",
     "notFoundText": "The link may be mistyped or the content may no longer exist.",
     "goHome": "Go to the home page",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "yes": "Yes",
+    "no": "No"
   },
   "nav": {
     "home": "Home",
@@ -253,7 +255,26 @@
     "photoOf": "Photo {index} of {total}",
     "actionsRequireAccount": "Sign in to contact, save or request a proposal.",
     "contactSoon": "Chat will be available in the next version.",
-    "ownListing": "This is your listing"
+    "ownListing": "This is your listing",
+    "reportTitle": "Report this listing",
+    "reportIntro": "Tell us what’s wrong. Our moderation team will review it and we won’t tell the person it was you.",
+    "reportReason": "Reason",
+    "reportDetails": "Details",
+    "reportSubmit": "Send report",
+    "reportDone": "Thank you. We’ve received your report and will review it as soon as possible.",
+    "reportAlready": "You had already reported this listing; we’re reviewing it.",
+    "reasons": {
+      "illegal": "Illegal activity",
+      "fraud": "Fraud or scam",
+      "contact_or_external_payment": "Asks for contact or payment off the platform",
+      "offensive": "Offensive or discriminatory content",
+      "minors": "Puts children at risk",
+      "regulated_without_license": "Regulated service without accreditation",
+      "spam": "Spam or duplicate listing",
+      "wrong_category": "Wrong category",
+      "other": "Other reason"
+    },
+    "emailVerifiedHelp": "Has confirmed they control that email address. It says nothing about their identity."
   },
   "categories": {
     "title": "Categories",

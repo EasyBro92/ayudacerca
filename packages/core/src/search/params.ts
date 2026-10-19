@@ -143,29 +143,37 @@ export function activeFilterCount(f: SearchFilters): number {
   ].filter((v) => v !== null).length + [f.verifiedOnly, f.withPhoto, f.recentOnly, f.urgentOnly].filter(Boolean).length;
 }
 
-/** Argumentos para la función SQL public.search_listings. */
+/**
+ * Argumentos para la función SQL public.search_listings.
+ * Solo incluye los filtros activos: el resto toma los valores por defecto de la función.
+ */
 export function toSearchRpcArgs(f: SearchFilters, pageSize: number = limits.search.pageSize) {
-  const sort = f.sort === 'recent' ? 'recent' : f.sort;
-  return {
-    p_query: f.q,
-    p_kind: f.kind,
-    p_category: f.category,
-    p_subcategory: f.subcategory,
-    p_municipality: f.municipality,
-    p_radius_km: f.radiusKm,
-    p_modality: f.modality,
-    p_price_min: f.priceMinCents,
-    p_price_max: f.priceMaxCents,
-    p_price_type: f.priceType,
-    p_min_rating: f.minRating,
-    p_verified_only: f.verifiedOnly,
-    p_with_photo: f.withPhoto,
-    p_recent_days: f.recentOnly ? 7 : null,
-    p_urgent_only: f.urgentOnly,
-    p_sort: sort,
+  const args: {
+    p_query?: string; p_kind?: ListingKind; p_category?: string; p_subcategory?: string; p_municipality?: string;
+    p_radius_km?: number; p_modality?: Modality; p_price_min?: number; p_price_max?: number; p_price_type?: PriceType;
+    p_min_rating?: number; p_verified_only?: boolean; p_with_photo?: boolean; p_recent_days?: number; p_urgent_only?: boolean;
+    p_sort: SortOption; p_limit: number; p_offset: number;
+  } = {
+    p_sort: f.sort,
     p_limit: pageSize,
     p_offset: Math.min((f.page - 1) * pageSize, limits.search.maxOffset),
   };
+  if (f.q !== null) args.p_query = f.q;
+  if (f.kind !== null) args.p_kind = f.kind;
+  if (f.category !== null) args.p_category = f.category;
+  if (f.subcategory !== null) args.p_subcategory = f.subcategory;
+  if (f.municipality !== null) args.p_municipality = f.municipality;
+  if (f.radiusKm !== null) args.p_radius_km = f.radiusKm;
+  if (f.modality !== null) args.p_modality = f.modality;
+  if (f.priceMinCents !== null) args.p_price_min = f.priceMinCents;
+  if (f.priceMaxCents !== null) args.p_price_max = f.priceMaxCents;
+  if (f.priceType !== null) args.p_price_type = f.priceType;
+  if (f.minRating !== null) args.p_min_rating = f.minRating;
+  if (f.verifiedOnly) args.p_verified_only = true;
+  if (f.withPhoto) args.p_with_photo = true;
+  if (f.recentOnly) args.p_recent_days = 7;
+  if (f.urgentOnly) args.p_urgent_only = true;
+  return args;
 }
 
 /**

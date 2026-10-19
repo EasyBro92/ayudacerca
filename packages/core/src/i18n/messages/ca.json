@@ -28,7 +28,9 @@
     "notFoundTitle": "No trobem aquesta pàgina",
     "notFoundText": "Potser l’enllaç està mal escrit o el contingut ja no existeix.",
     "goHome": "Anar a la portada",
-    "comingSoon": "Disponible aviat"
+    "comingSoon": "Disponible aviat",
+    "yes": "Sí",
+    "no": "No"
   },
   "nav": {
     "home": "Inici",
@@ -253,7 +255,26 @@
     "photoOf": "Foto {index} de {total}",
     "actionsRequireAccount": "Inicia la sessió per contactar, desar o demanar una proposta.",
     "contactSoon": "El xat estarà disponible en la propera versió.",
-    "ownListing": "Aquest és el teu anunci"
+    "ownListing": "Aquest és el teu anunci",
+    "reportTitle": "Denunciar aquest anunci",
+    "reportIntro": "Explica’ns què passa. Ho revisarà l’equip de moderació i no avisarem la persona que has estat tu.",
+    "reportReason": "Motiu",
+    "reportDetails": "Detalls",
+    "reportSubmit": "Enviar la denúncia",
+    "reportDone": "Gràcies. Hem rebut la teva denúncia i la revisarem al més aviat possible.",
+    "reportAlready": "Ja havies denunciat aquest anunci; l’estem revisant.",
+    "reasons": {
+      "illegal": "Activitat il·legal",
+      "fraud": "Frau o estafa",
+      "contact_or_external_payment": "Demana contacte o pagament fora de la plataforma",
+      "offensive": "Contingut ofensiu o discriminatori",
+      "minors": "Posa en risc menors",
+      "regulated_without_license": "Servei regulat sense acreditació",
+      "spam": "Correu brossa o anunci repetit",
+      "wrong_category": "Categoria equivocada",
+      "other": "Un altre motiu"
+    },
+    "emailVerifiedHelp": "Ha confirmat que controla aquesta adreça de correu. No diu res sobre la seva identitat."
   },
   "categories": {
     "title": "Categories",

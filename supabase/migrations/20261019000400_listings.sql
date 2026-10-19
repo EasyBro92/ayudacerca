@@ -408,7 +408,8 @@ create or replace function public.search_listings(
   p_urgent_only    boolean default false,
   p_sort           text default 'relevance',
   p_limit          integer default 20,
-  p_offset         integer default 0
+  p_offset         integer default 0,
+  p_ids            uuid[] default null
 )
 returns table (
   id                     uuid,
@@ -497,6 +498,7 @@ as $$
       and (not coalesce(p_with_photo, false) or exists (select 1 from public.listing_images i where i.listing_id = l.id))
       and (p_recent_days is null or l.published_at >= now() - make_interval(days => p_recent_days))
       and (not coalesce(p_urgent_only, false) or l.is_urgent)
+      and (p_ids is null or l.id = any(p_ids))
   )
   select
     b.id, b.slug, b.kind, b.title, b.price_cents, b.price_type, b.currency, b.modality, b.is_urgent, b.status, b.published_at,

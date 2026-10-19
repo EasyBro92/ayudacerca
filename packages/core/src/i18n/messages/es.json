@@ -28,7 +28,9 @@
     "notFoundTitle": "No encontramos esta página",
     "notFoundText": "Puede que el enlace esté mal escrito o que el contenido ya no exista.",
     "goHome": "Ir a la portada",
-    "comingSoon": "Disponible próximamente"
+    "comingSoon": "Disponible próximamente",
+    "yes": "Sí",
+    "no": "No"
   },
   "nav": {
     "home": "Inicio",
@@ -253,7 +255,26 @@
     "photoOf": "Foto {index} de {total}",
     "actionsRequireAccount": "Inicia sesión para contactar, guardar o pedir una propuesta.",
     "contactSoon": "El chat estará disponible en la próxima versión.",
-    "ownListing": "Este es tu anuncio"
+    "ownListing": "Este es tu anuncio",
+    "reportTitle": "Denunciar este anuncio",
+    "reportIntro": "Cuéntanos qué pasa. Lo revisará el equipo de moderación y no avisaremos a la persona de que has sido tú.",
+    "reportReason": "Motivo",
+    "reportDetails": "Detalles",
+    "reportSubmit": "Enviar denuncia",
+    "reportDone": "Gracias. Hemos recibido tu denuncia y la revisaremos lo antes posible.",
+    "reportAlready": "Ya habías denunciado este anuncio; lo estamos revisando.",
+    "reasons": {
+      "illegal": "Actividad ilegal",
+      "fraud": "Fraude o estafa",
+      "contact_or_external_payment": "Pide contacto o pago fuera de la plataforma",
+      "offensive": "Contenido ofensivo o discriminatorio",
+      "minors": "Pone en riesgo a menores",
+      "regulated_without_license": "Servicio regulado sin acreditación",
+      "spam": "Spam o anuncio repetido",
+      "wrong_category": "Categoría equivocada",
+      "other": "Otro motivo"
+    },
+    "emailVerifiedHelp": "Ha confirmado que controla esa dirección de correo. No dice nada sobre su identidad."
   },
   "categories": {
     "title": "Categorías",

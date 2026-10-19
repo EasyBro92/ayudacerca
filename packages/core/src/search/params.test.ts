@@ -51,6 +51,9 @@ describe('utilidades', () => {
     expect(args.p_offset).toBe(40);
     expect(args.p_limit).toBe(20);
     expect(toSearchRpcArgs({ ...DEFAULT_FILTERS, page: 50 }, 50).p_offset).toBe(1000);
+    expect(toSearchRpcArgs(DEFAULT_FILTERS)).toEqual({ p_sort: 'relevance', p_limit: 20, p_offset: 0 });
+    const all = toSearchRpcArgs(parseSearchParams(new URLSearchParams('q=a&tipo=ofrecen&categoria=c&sub=s&en=m&radio=5&modalidad=online&min=1&max=2&precio=fijo&valoracion=4&verificados=1&fotos=1&recientes=1&urgentes=1')));
+    expect(Object.keys(all)).toHaveLength(18);
   });
 
   it('solo indexa combinaciones canónicas', () => {
