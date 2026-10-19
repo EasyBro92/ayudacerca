@@ -62,6 +62,8 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<{ status: 'published' | 'pending_review'; slug: string } | null>(null);
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const scrollRef = useRef<ScrollViewInstance>(null);
 
   const applyDraft = useCallback((cat: Awaited<ReturnType<typeof loadWizardCatalog>>, draft: Awaited<ReturnType<typeof getOrCreateDraft>>) => {
@@ -84,11 +86,11 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   useEffect(() => {
     let cancelled = false;
     Promise.all([loadWizardCatalog(locale), getOrCreateDraft(userId, kindParam, false)]).then(
-      ([cat, draft]) => { if (!cancelled) applyDraft(cat, draft); },
-      () => undefined,
+      ([cat, draft]) => { if (!cancelled) { setLoadError(false); applyDraft(cat, draft); } },
+      () => { if (!cancelled) setLoadError(true); },
     );
     return () => { cancelled = true; };
-  }, [locale, userId, kindParam, applyDraft]);
+  }, [locale, userId, kindParam, applyDraft, reloadKey]);
 
   // Guardado automático
   useEffect(() => {
@@ -97,6 +99,14 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
     return () => clearTimeout(timer);
   }, [data, step, draftId]);
 
+  if (loadError && (!catalog || !draftId)) {
+    return (
+      <Screen>
+        <Notice tone="danger">{t('errors.unavailable')}</Notice>
+        <Button title={t('common.retry')} onPress={() => setReloadKey((k) => k + 1)} />
+      </Screen>
+    );
+  }
   if (!catalog || !draftId) return <Loading label={t('common.loading')} />;
   const category = catalog.categories.find((c) => c.id === data.categoryId) ?? null;
   const update = (patch: Partial<DraftData>) => setData((d) => ({ ...d, ...patch }));

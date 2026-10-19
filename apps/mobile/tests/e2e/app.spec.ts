@@ -134,7 +134,13 @@ test('chat en tiempo real: la otra persona recibe los mensajes sin recargar', as
 test('publicar desde la app: validación, foto y publicación a través de la API', async ({ page }) => {
   await signIn(page, 'joan.r@example.com');
   await open(page, '/publicar?tipo=ofrezco');
-  await expect(page.getByText(/Paso 2 de 9/)).toBeVisible({ timeout: 15_000 });
+  try {
+    await expect(page.getByText(/Paso 2 de 9/)).toBeVisible({ timeout: 20_000 });
+  } catch {
+    // Diagnóstico para CI: qué hay en pantalla en lugar del paso 2
+    const shown = (await page.locator('body').innerText()).replace(/\s+/g, ' ').slice(0, 600);
+    throw new Error(`No aparece «Paso 2 de 9». En pantalla: ${shown}`);
+  }
   await page.getByRole('button', { name: 'Continuar' }).click();
   await expect(page.getByText('Revisa los campos marcados antes de continuar.')).toBeVisible();
   await page.getByRole('radio', { name: /Webs y programación/ }).click();

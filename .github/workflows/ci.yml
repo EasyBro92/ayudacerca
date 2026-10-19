@@ -29,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: supabase/setup-cli@v1
-        with: { version: latest }
+        with: { version: 2.121.0 }
       - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
       - run: supabase test db
 
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-node@v5
         with: { node-version: 22, cache: pnpm }
       - uses: supabase/setup-cli@v1
-        with: { version: latest }
+        with: { version: 2.121.0 }
       - run: pnpm install --frozen-lockfile
       - run: supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
       - name: Variables de entorno de prueba (claves locales de Supabase, no son secretos)
