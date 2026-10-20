@@ -239,7 +239,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
       {similar.length > 0 ? (
         <section aria-labelledby="similar" className="mt-12">
           <h2 id="similar" className="mb-4 text-2xl">{t('similar')}</h2>
-          <ul className="stagger grid gap-3 lg:grid-cols-2">
+          <ul className="stagger grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
             {similar.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
           </ul>
         </section>

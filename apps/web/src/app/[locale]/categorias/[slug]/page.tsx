@@ -77,7 +77,7 @@ export default async function CategoryPage({ params }: PageProps<'/[locale]/cate
           <Button asChild variant="accent"><Link href="/publicar">{tNav('publish')}</Link></Button>
         </div>
       ) : (
-        <ul className="stagger mt-4 grid gap-3 lg:grid-cols-2">
+        <ul className="stagger mt-4 grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
           {result.items.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
         </ul>
       )}

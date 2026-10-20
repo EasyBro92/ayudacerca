@@ -57,7 +57,7 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
         {favorites.length === 0 ? (
           <p className="text-ink-muted">{t('noFavorites')} <Link href="/explorar" className="font-semibold text-primary underline">{tNav('explore')}</Link></p>
         ) : (
-          <ul className="stagger grid gap-3 lg:grid-cols-2">
+          <ul className="stagger grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
             {favorites.map((l) => <li key={l.id}><ListingCard listing={l} saved /></li>)}
           </ul>
         )}

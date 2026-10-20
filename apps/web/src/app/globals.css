@@ -102,10 +102,14 @@
 @utility container-page {
   margin-inline: auto;
   width: 100%;
-  max-width: 76rem;
+  /* Se adapta a la pantalla: en móvil ocupa todo; en PC grande llega a 1600 px con márgenes cómodos */
+  max-width: 100rem;
   padding-inline: 1rem;
   @media (width >= 48rem) {
     padding-inline: 1.5rem;
+  }
+  @media (width >= 80rem) {
+    padding-inline: 2.5rem;
   }
 }
 

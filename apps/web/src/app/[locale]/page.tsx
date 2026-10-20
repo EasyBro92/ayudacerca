@@ -18,12 +18,12 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
   setRequestLocale(locale as 'es');
   const [t, tCat, categories, stats, offers, requests, favoriteIds, helpers] = await Promise.all([
     getTranslations('home'), getTranslations('categories'), getCategories(locale), getPlatformStats(),
-    getRecentListings('offer', locale, 4), getRecentListings('request', locale, 4), getFavoriteIds(), getAvailableHelpers(),
+    getRecentListings('offer', locale, 6), getRecentListings('request', locale, 6), getFavoriteIds(), getAvailableHelpers(),
   ]);
   const anyStat = Object.values(stats.visible).some(Boolean);
 
   const list = (items: ListingCardData[]) => (
-    <ul className="stagger grid gap-3 lg:grid-cols-2">
+    <ul className="stagger grid gap-3 lg:grid-cols-2 2xl:grid-cols-3">
       {items.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
     </ul>
   );
@@ -73,7 +73,7 @@ export default async function HomePage({ params }: PageProps<'/[locale]'>) {
       {/* CATEGORÍAS */}
       <section aria-labelledby="cats" className="container-page mt-14">
         <h2 id="cats" className="mb-5 text-2xl md:text-3xl">{t('categoriesTitle')}</h2>
-        <ul className="stagger grid grid-cols-2 gap-3 md:grid-cols-4">
+        <ul className="stagger grid grid-cols-2 gap-3 md:grid-cols-4 2xl:grid-cols-8">
           {categories.map((c) => (
             <li key={c.slug}>
               <Link href={`/categorias/${c.slug}`} className="press flex h-full flex-col items-start gap-3 rounded-[var(--radius-xl)] p-4 hover:shadow-[var(--shadow-raised)]" style={{ backgroundColor: `color-mix(in srgb, ${c.color} 9%, white)` }}>

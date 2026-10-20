@@ -9,7 +9,7 @@ export async function AvailableHelpers({ helpers }: { helpers: AvailableHelper[]
   const [t, tListing] = await Promise.all([getTranslations('helpers'), getTranslations('listing')]);
   if (helpers.length === 0) return <p className="rounded-3xl bg-surface p-5 text-ink-muted">{t('noneAvailable')}</p>;
   return (
-    <ul className="stagger -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-4">
+    <ul className="stagger -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-3 md:px-0 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
       {helpers.map((h) => (
         <li key={h.id} className="w-60 shrink-0 snap-start md:w-auto">
           <Link href={`/personas/${h.username}`} className="press flex h-full flex-col items-center gap-2 rounded-[var(--radius-xl)] border border-border/70 bg-surface p-5 text-center shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-raised)]">
