@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{brand} · Tech and online help, person to person",
+    "title": "{brand} · Tell us your problem and get a hand",
     "description": "Ask for or offer help with IT, websites, design, online paperwork, video-call lessons and much more. In-app chat, no need to share your phone number.",
     "exploreTitle": "Explore help listings",
     "categoriesTitle": "Help categories",
@@ -45,13 +45,15 @@
     "favorites": "Saved",
     "signOut": "Sign out",
     "categories": "Categories",
-    "help": "Help",
+    "help": "Help out",
     "safety": "Safety",
-    "profile": "Profile"
+    "profile": "Profile",
+    "ask": "Ask",
+    "me": "Me"
   },
   "home": {
-    "heroTitle": "Tech help, without leaving home",
-    "heroSubtitle": "Find someone to help with your computer, a website, online paperwork or a video-call lesson. Or share what you know with someone who needs it.",
+    "heroTitle": "Has technology turned against you?",
+    "heroSubtitle": "Tell us your problem and someone who knows will lend a hand: by video call, screen sharing or however you prefer.",
     "searchWhat": "What do you need?",
     "searchWhatPlaceholder": "E.g. set up Wi-Fi, build a website…",
     "searchWhere": "Where?",
@@ -91,7 +93,7 @@
     "recentTitle": "Recent listings",
     "tabOffers": "Offering help",
     "tabRequests": "Needing help",
-    "categoriesTitle": "Browse by category",
+    "categoriesTitle": "What can we help with?",
     "howTitle": "How it works",
     "how1Title": "Post",
     "how1Text": "Explain what you need or what you offer.",
@@ -119,7 +121,39 @@
     "safety6Title": "Private location",
     "safety6Text": "We only show the town or an approximate distance, never your address.",
     "ctaTitle": "Asking or helping today?",
-    "ctaText": "Creating an account is free."
+    "ctaText": "Creating an account is free.",
+    "problemLabel": "Tell us your problem",
+    "problemPlaceholder": "E.g. my computer is super slow and weird ads keep popping up",
+    "problemHint": "One sentence is enough. Nobody will judge you for not knowing.",
+    "suggestedTitle": "Sounds like…",
+    "askCtaShort": "Ask for help",
+    "findHelpers": "See who can help",
+    "examplesTitle": "Or start with a classic:",
+    "examples": {
+      "slowComputer": "My computer is slow",
+      "excel": "Excel is beating me",
+      "website": "I want a website",
+      "appointment": "Book an appointment",
+      "logo": "A logo for my business",
+      "lessons": "Lessons by video call"
+    },
+    "availableTitle": "Available now",
+    "availableText": "People who can lend you a hand today.",
+    "requestsTitle": "People who need a hand",
+    "requestsText": "Good at this? Maybe you can help someone today.",
+    "offersTitle": "Help on offer",
+    "stepsTitle": "It’s that easy",
+    "step1Title": "Tell us",
+    "step1Text": "Describe your problem in your own words, no jargon.",
+    "step2Title": "Chat",
+    "step2Text": "People who know will message you. Chat here without sharing your number.",
+    "step3Title": "Sorted!",
+    "step3Text": "Fix it by video call or screen share. And say thanks if you like.",
+    "helperCtaTitle": "Are you the one who fixes things?",
+    "helperCtaText": "If your family calls you when the Wi-Fi fails, people here need you.",
+    "helperCta": "I want to help",
+    "seeAllRequests": "See all requests",
+    "seeAllOffers": "See all offers"
   },
   "kinds": {
     "offer": "Offering help",
@@ -155,9 +189,9 @@
   },
   "explore": {
     "title": "Explore",
-    "heading": "Find help or people to help",
+    "heading": "Requests and help",
     "results": "{count, plural, =0 {No results} one {# result} other {# results}}",
-    "searchPlaceholder": "E.g. set up Wi-Fi, build a website, Excel…",
+    "searchPlaceholder": "Search: Wi-Fi, Excel, a website…",
     "filters": "Filters",
     "filtersWithCount": "Filters ({count})",
     "clearFilters": "Clear filters",
@@ -206,7 +240,8 @@
     "previous": "Previous",
     "nextPage": "Next",
     "pageOf": "Page {page} of {total}",
-    "rankingInfo": "How we rank results"
+    "rankingInfo": "How we rank results",
+    "helpHeading": "People who need a hand"
   },
   "listing": {
     "postedBy": "Posted by",
@@ -417,7 +452,16 @@
     "legalTitle": "Legal information",
     "welcomeTitle": "Your space on {brand}",
     "welcomeText": "Sign in to post listings, chat with other people and save favourites.",
-    "version": "Version {version}"
+    "version": "Version {version}",
+    "availableTitle": "Can you help now?",
+    "availableText": "We’ll show you as “Available now” for {hours} hours. It switches off by itself.",
+    "availableOn": "I’m available",
+    "availableOff": "I’m no longer available",
+    "availableUntil": "Available until {time}",
+    "skillsTitle": "What you’re good at",
+    "skillsText": "Up to 12 skills separated by commas (e.g. Excel, WordPress, phones).",
+    "skillsSave": "Save skills",
+    "skillsSaved": "Saved. Thanks for lending a hand!"
   },
   "a11y": {
     "skipToContent": "Skip to content",
@@ -543,8 +587,8 @@
   },
   "chat": {
     "title": "Messages",
-    "empty": "No conversations yet",
-    "emptyHint": "When you message someone from a listing, or someone messages you, the conversation will appear here.",
+    "empty": "It’s very quiet in here",
+    "emptyHint": "When you message someone, or someone messages you, the conversation will show up here.",
     "exploreCta": "Explore listings",
     "about": "About “{title}”",
     "you": "You",
@@ -601,5 +645,23 @@
       "chat_forbidden": "You can’t write in this conversation.",
       "generic": "Couldn’t send. Please try again."
     }
+  },
+  "requests": {
+    "offer": "Offers help",
+    "request": "Needs help",
+    "by": "by {name}",
+    "how": {
+      "online": "By video call",
+      "in_person": "In person",
+      "hybrid": "Remote or in person",
+      "at_home": "At home",
+      "agreed_location": "Wherever you agree"
+    }
+  },
+  "helpers": {
+    "availableNow": "Available now",
+    "skills": "Good at",
+    "write": "View profile",
+    "noneAvailable": "Nobody is marked as available right now. Post your request and people will message you."
   }
 }

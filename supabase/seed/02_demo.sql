@@ -351,4 +351,9 @@ insert into public.listing_favorites (user_id, listing_id) values ('00000000-000
 insert into public.listing_favorites (user_id, listing_id) values ('00000000-0000-4000-a000-000000000001', '00000000-0000-4000-b000-000000000004');
 insert into public.listing_favorites (user_id, listing_id) values ('00000000-0000-4000-a000-000000000001', '00000000-0000-4000-b000-000000000008');
 insert into public.listing_favorites (user_id, listing_id) values ('00000000-0000-4000-a000-000000000001', '00000000-0000-4000-b000-000000000014');
+update public.profiles p set skills = coalesce((select array_agg(t) from (select distinct t from public.listings l join public.categories c on c.id = l.category_id and c.is_active, unnest(l.tags) t where l.author_id = p.id and l.kind = 'offer' and char_length(t) between 2 and 30 order by t limit 6) x), '{}');
+update public.profiles set available_until = now() + interval '8 hours' where id = '00000000-0000-4000-a000-000000000002';
+update public.profiles set available_until = now() + interval '8 hours' where id = '00000000-0000-4000-a000-000000000008';
+update public.profiles set available_until = now() + interval '8 hours' where id = '00000000-0000-4000-a000-000000000020';
+update public.profiles set available_until = now() + interval '8 hours' where id = '00000000-0000-4000-a000-000000000028';
 commit;

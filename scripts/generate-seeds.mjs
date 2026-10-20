@@ -135,6 +135,9 @@ where c.slug = ${q(cat)} and m.slug = ${q(city ?? authorCity)};`);
 
 // Algunos favoritos de la cuenta cliente
 for (const i of [0, 3, 7, 13]) demo.push(`insert into public.listing_favorites (user_id, listing_id) values (${q(uid(0))}, ${q(lid(i))});`);
+// Habilidades de quien ayuda: las etiquetas de sus ofertas (máx. 6). Algunas personas «disponibles ahora».
+demo.push(`update public.profiles p set skills = coalesce((select array_agg(t) from (select distinct t from public.listings l join public.categories c on c.id = l.category_id and c.is_active, unnest(l.tags) t where l.author_id = p.id and l.kind = 'offer' and char_length(t) between 2 and 30 order by t limit 6) x), '{}');`);
+for (const i of [1, 7, 19, 27]) demo.push(`update public.profiles set available_until = now() + interval '8 hours' where id = ${q(uid(i))};`);
 
 demo.push('commit;');
 writeFileSync(join(root, 'supabase/seed/02_demo.sql'), demo.join('\n') + '\n');

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{brand} · Ajuda amb la tecnologia i en línia, entre persones",
+    "title": "{brand} · Explica’ns el teu problema i et donem un cop de mà",
     "description": "Demana o ofereix ajuda amb informàtica, webs, disseny, tràmits en línia, classes per videotrucada i molt més. Xat intern i sense compartir el telèfon.",
     "exploreTitle": "Explorar anuncis d’ajuda",
     "categoriesTitle": "Categories d’ajuda",
@@ -45,13 +45,15 @@
     "favorites": "Preferits",
     "signOut": "Tancar la sessió",
     "categories": "Categories",
-    "help": "Ajuda",
+    "help": "Ajudar",
     "safety": "Seguretat",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "ask": "Demanar",
+    "me": "Jo"
   },
   "home": {
-    "heroTitle": "Ajuda amb la tecnologia, sense sortir de casa",
-    "heroSubtitle": "Troba algú que t’ajudi amb l’ordinador, una web, un tràmit en línia o una classe per videotrucada. O comparteix el que saps amb qui ho necessita.",
+    "heroTitle": "Se t’ha rebel·lat la tecnologia?",
+    "heroSubtitle": "Explica’ns el teu problema i algú que en sap et donarà un cop de mà: per videotrucada, compartint pantalla o com prefereixis.",
     "searchWhat": "Què necessites?",
     "searchWhatPlaceholder": "Ex.: configurar el wifi, fer una web…",
     "searchWhere": "On?",
@@ -91,7 +93,7 @@
     "recentTitle": "Anuncis recents",
     "tabOffers": "Ofereixen ajuda",
     "tabRequests": "Necessiten ajuda",
-    "categoriesTitle": "Explora per categoria",
+    "categoriesTitle": "Amb què t’ajudem?",
     "howTitle": "Com funciona",
     "how1Title": "Publica",
     "how1Text": "Explica què necessites o què ofereixes.",
@@ -119,7 +121,39 @@
     "safety6Title": "Ubicació privada",
     "safety6Text": "Només mostrem el municipi o una distància aproximada, mai la teva adreça.",
     "ctaTitle": "Avui et toca demanar o ajudar?",
-    "ctaText": "Crear un compte és gratuït."
+    "ctaText": "Crear un compte és gratuït.",
+    "problemLabel": "Explica’ns el teu problema",
+    "problemPlaceholder": "Ex.: el meu ordinador va lentíssim i surten anuncis estranys",
+    "problemHint": "Amb una frase n’hi ha prou. Ningú no et jutjarà per no saber-ne.",
+    "suggestedTitle": "Sembla cosa de…",
+    "askCtaShort": "Demanar ajuda",
+    "findHelpers": "Veure qui em pot ajudar",
+    "examplesTitle": "O comença per un clàssic:",
+    "examples": {
+      "slowComputer": "El meu ordinador va lent",
+      "excel": "No me’n surto amb l’Excel",
+      "website": "Vull una web",
+      "appointment": "Demanar cita prèvia",
+      "logo": "Un logo per al meu negoci",
+      "lessons": "Classes per videotrucada"
+    },
+    "availableTitle": "Disponibles ara",
+    "availableText": "Persones que et poden donar un cop de mà avui mateix.",
+    "requestsTitle": "Gent que necessita un cop de mà",
+    "requestsText": "Se’t dona bé? Potser avui pots ajudar algú.",
+    "offersTitle": "Ajudes que s’ofereixen",
+    "stepsTitle": "Així de fàcil",
+    "step1Title": "Explica-ho",
+    "step1Text": "Explica el teu problema amb les teves paraules, sense tecnicismes.",
+    "step2Title": "Parla",
+    "step2Text": "T’escriuen persones que en saben. Parleu pel xat, sense donar el telèfon.",
+    "step3Title": "Resolt!",
+    "step3Text": "Ho arregleu per videotrucada o pantalla compartida. I si vols, dones les gràcies.",
+    "helperCtaTitle": "Ets dels que arreglen coses?",
+    "helperCtaText": "Si la teva família et truca quan falla el wifi, aquí hi ha gent que et necessita.",
+    "helperCta": "Vull ajudar",
+    "seeAllRequests": "Veure totes les peticions",
+    "seeAllOffers": "Veure totes les ajudes"
   },
   "kinds": {
     "offer": "Ofereix ajuda",
@@ -155,9 +189,9 @@
   },
   "explore": {
     "title": "Explorar",
-    "heading": "Troba ajuda o persones a qui ajudar",
+    "heading": "Peticions i ajudes",
     "results": "{count, plural, =0 {Cap resultat} one {# resultat} other {# resultats}}",
-    "searchPlaceholder": "Ex.: configurar el wifi, fer una web, Excel…",
+    "searchPlaceholder": "Cerca: wifi, Excel, una web…",
     "filters": "Filtres",
     "filtersWithCount": "Filtres ({count})",
     "clearFilters": "Treure els filtres",
@@ -206,7 +240,8 @@
     "previous": "Anterior",
     "nextPage": "Següent",
     "pageOf": "Pàgina {page} de {total}",
-    "rankingInfo": "Com ordenem els resultats"
+    "rankingInfo": "Com ordenem els resultats",
+    "helpHeading": "Gent que necessita un cop de mà"
   },
   "listing": {
     "postedBy": "Publicat per",
@@ -417,7 +452,16 @@
     "legalTitle": "Informació legal",
     "welcomeTitle": "El teu espai a {brand}",
     "welcomeText": "Entra per publicar anuncis, parlar amb altres persones pel xat i desar preferits.",
-    "version": "Versió {version}"
+    "version": "Versió {version}",
+    "availableTitle": "Pots ajudar ara?",
+    "availableText": "Et mostrarem com a «Disponible ara» durant {hours} hores. S’apaga sol.",
+    "availableOn": "Estic disponible",
+    "availableOff": "Ja no estic disponible",
+    "availableUntil": "Disponible fins a les {time}",
+    "skillsTitle": "El que se’t dona bé",
+    "skillsText": "Fins a 12 habilitats separades per comes (ex.: Excel, WordPress, mòbils).",
+    "skillsSave": "Desar habilitats",
+    "skillsSaved": "Desat. Gràcies per donar un cop de mà!"
   },
   "a11y": {
     "skipToContent": "Saltar al contingut",
@@ -543,8 +587,8 @@
   },
   "chat": {
     "title": "Missatges",
-    "empty": "Encara no tens converses",
-    "emptyHint": "Quan escriguis a algú des d’un anunci, o algú t’escrigui, la conversa apareixerà aquí.",
+    "empty": "Aquí encara hi ha molt de silenci",
+    "emptyHint": "Quan escriguis a algú, o algú t’escrigui, la conversa apareixerà aquí.",
     "exploreCta": "Explorar anuncis",
     "about": "Sobre «{title}»",
     "you": "Tu",
@@ -601,5 +645,23 @@
       "chat_forbidden": "No pots escriure en aquesta conversa.",
       "generic": "No s’ha pogut enviar. Torna-ho a provar."
     }
+  },
+  "requests": {
+    "offer": "Ofereix ajuda",
+    "request": "Necessita ajuda",
+    "by": "de {name}",
+    "how": {
+      "online": "Per videotrucada",
+      "in_person": "En persona",
+      "hybrid": "En remot o en persona",
+      "at_home": "A domicili",
+      "agreed_location": "On acordeu"
+    }
+  },
+  "helpers": {
+    "availableNow": "Disponible ara",
+    "skills": "Se li dona bé",
+    "write": "Veure perfil",
+    "noneAvailable": "Ara mateix no hi ha ningú marcat com a disponible. Publica la teva petició i t’escriuran."
   }
 }

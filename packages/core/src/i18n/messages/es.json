@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "{brand} · Ayuda con la tecnología y online, entre personas",
+    "title": "{brand} · Cuéntanos tu problema y te echamos una mano",
     "description": "Pide u ofrece ayuda con informática, webs, diseño, trámites online, clases por videollamada y mucho más. Chat interno y sin compartir tu teléfono.",
     "exploreTitle": "Explorar anuncios de ayuda",
     "categoriesTitle": "Categorías de ayuda",
@@ -45,13 +45,15 @@
     "favorites": "Favoritos",
     "signOut": "Cerrar sesión",
     "categories": "Categorías",
-    "help": "Ayuda",
+    "help": "Ayudar",
     "safety": "Seguridad",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "ask": "Pedir",
+    "me": "Yo"
   },
   "home": {
-    "heroTitle": "Ayuda con la tecnología, sin salir de casa",
-    "heroSubtitle": "Encuentra a alguien que te ayude con el ordenador, una web, un trámite online o una clase por videollamada. O comparte lo que sabes con quien lo necesita.",
+    "heroTitle": "¿Se te ha rebelado la tecnología?",
+    "heroSubtitle": "Cuéntanos tu problema y alguien que sabe te echa una mano: por videollamada, compartiendo pantalla o como prefieras.",
     "searchWhat": "¿Qué necesitas?",
     "searchWhatPlaceholder": "Ej.: configurar el wifi, hacer una web…",
     "searchWhere": "¿Dónde?",
@@ -91,7 +93,7 @@
     "recentTitle": "Anuncios recientes",
     "tabOffers": "Ofrecen ayuda",
     "tabRequests": "Necesitan ayuda",
-    "categoriesTitle": "Explora por categoría",
+    "categoriesTitle": "¿Con qué te ayudamos?",
     "howTitle": "Cómo funciona",
     "how1Title": "Publica",
     "how1Text": "Explica qué necesitas o qué ofreces.",
@@ -119,7 +121,39 @@
     "safety6Title": "Ubicación privada",
     "safety6Text": "Solo mostramos el municipio o una distancia aproximada, nunca tu dirección.",
     "ctaTitle": "¿Hoy te toca pedir o ayudar?",
-    "ctaText": "Crear una cuenta es gratis."
+    "ctaText": "Crear una cuenta es gratis.",
+    "problemLabel": "Cuéntanos tu problema",
+    "problemPlaceholder": "Ej.: mi ordenador va lentísimo y salen anuncios raros",
+    "problemHint": "Con una frase basta. Nadie te va a juzgar por no saber.",
+    "suggestedTitle": "Parece cosa de…",
+    "askCtaShort": "Pedir ayuda",
+    "findHelpers": "Ver quién puede ayudarme",
+    "examplesTitle": "O empieza por un clásico:",
+    "examples": {
+      "slowComputer": "Mi ordenador va lento",
+      "excel": "No me aclaro con Excel",
+      "website": "Quiero una web",
+      "appointment": "Pedir cita previa",
+      "logo": "Un logo para mi negocio",
+      "lessons": "Clases por videollamada"
+    },
+    "availableTitle": "Disponibles ahora",
+    "availableText": "Personas que pueden echarte una mano hoy mismo.",
+    "requestsTitle": "Gente que necesita una mano",
+    "requestsText": "¿Se te da bien? Quizá puedas ayudar a alguien hoy.",
+    "offersTitle": "Ayudas que se ofrecen",
+    "stepsTitle": "Así de fácil",
+    "step1Title": "Cuéntalo",
+    "step1Text": "Explica tu problema con tus palabras, sin tecnicismos.",
+    "step2Title": "Habla",
+    "step2Text": "Te escriben personas que saben. Habláis por el chat, sin dar tu teléfono.",
+    "step3Title": "¡Resuelto!",
+    "step3Text": "Lo arregláis por videollamada o pantalla compartida. Y si quieres, das las gracias.",
+    "helperCtaTitle": "¿Eres de los que arreglan cosas?",
+    "helperCtaText": "Si tu familia te llama cuando falla el wifi, aquí hay gente que te necesita.",
+    "helperCta": "Quiero ayudar",
+    "seeAllRequests": "Ver todas las peticiones",
+    "seeAllOffers": "Ver todas las ayudas"
   },
   "kinds": {
     "offer": "Ofrece ayuda",
@@ -155,9 +189,9 @@
   },
   "explore": {
     "title": "Explorar",
-    "heading": "Encuentra ayuda o personas a las que ayudar",
+    "heading": "Peticiones y ayudas",
     "results": "{count, plural, =0 {Ningún resultado} one {# resultado} other {# resultados}}",
-    "searchPlaceholder": "Ej.: configurar el wifi, hacer una web, Excel…",
+    "searchPlaceholder": "Busca: wifi, Excel, una web…",
     "filters": "Filtros",
     "filtersWithCount": "Filtros ({count})",
     "clearFilters": "Quitar filtros",
@@ -206,7 +240,8 @@
     "previous": "Anterior",
     "nextPage": "Siguiente",
     "pageOf": "Página {page} de {total}",
-    "rankingInfo": "Cómo ordenamos los resultados"
+    "rankingInfo": "Cómo ordenamos los resultados",
+    "helpHeading": "Gente que necesita una mano"
   },
   "listing": {
     "postedBy": "Publicado por",
@@ -417,7 +452,16 @@
     "legalTitle": "Información legal",
     "welcomeTitle": "Tu espacio en {brand}",
     "welcomeText": "Entra para publicar anuncios, hablar con otras personas por el chat y guardar favoritos.",
-    "version": "Versión {version}"
+    "version": "Versión {version}",
+    "availableTitle": "¿Puedes ayudar ahora?",
+    "availableText": "Te mostraremos como «Disponible ahora» durante {hours} horas. Se apaga solo.",
+    "availableOn": "Estoy disponible",
+    "availableOff": "Ya no estoy disponible",
+    "availableUntil": "Disponible hasta las {time}",
+    "skillsTitle": "Lo que se te da bien",
+    "skillsText": "Hasta 12 habilidades separadas por comas (ej.: Excel, WordPress, móviles).",
+    "skillsSave": "Guardar habilidades",
+    "skillsSaved": "Guardado. ¡Gracias por echar una mano!"
   },
   "a11y": {
     "skipToContent": "Saltar al contenido",
@@ -543,8 +587,8 @@
   },
   "chat": {
     "title": "Mensajes",
-    "empty": "Todavía no tienes conversaciones",
-    "emptyHint": "Cuando escribas a alguien desde un anuncio, o alguien te escriba, la conversación aparecerá aquí.",
+    "empty": "Aquí todavía hay mucho silencio",
+    "emptyHint": "Cuando escribas a alguien, o alguien te escriba, la conversación aparecerá aquí.",
     "exploreCta": "Explorar anuncios",
     "about": "Sobre «{title}»",
     "you": "Tú",
@@ -601,5 +645,23 @@
       "chat_forbidden": "No puedes escribir en esta conversación.",
       "generic": "No se ha podido enviar. Inténtalo de nuevo."
     }
+  },
+  "requests": {
+    "offer": "Ofrece ayuda",
+    "request": "Necesita ayuda",
+    "by": "de {name}",
+    "how": {
+      "online": "Por videollamada",
+      "in_person": "En persona",
+      "hybrid": "En remoto o en persona",
+      "at_home": "A domicilio",
+      "agreed_location": "Donde acordéis"
+    }
+  },
+  "helpers": {
+    "availableNow": "Disponible ahora",
+    "skills": "Se le da bien",
+    "write": "Ver perfil",
+    "noneAvailable": "Ahora mismo no hay nadie marcado como disponible. Publica tu petición y te escribirán."
   }
 }
