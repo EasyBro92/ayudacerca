@@ -1,17 +1,17 @@
 import { formatRelativeDate } from '@ayudacerca/core';
 import { router, useFocusEffect } from 'expo-router';
-import { MessageCircle } from 'lucide-react-native';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useLocale, useTranslations } from 'use-intl';
 import { Avatar } from '@/components/avatar';
 import { FadeInItem, PressableScale } from '@/components/motion';
+import { StepIllustration } from '@/components/illustrations';
 import { Screen } from '@/components/screen';
 import { ConversationListSkeleton } from '@/components/skeleton';
 import { AppText, Button, CenteredState } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { type ConversationSummary, getConversations, subscribeToConversations } from '@/lib/chat';
-import { colors, radius, space } from '@/lib/theme';
+import { colors, space } from '@/lib/theme';
 
 export default function MessagesScreen() {
   const t = useTranslations();
@@ -19,7 +19,7 @@ export default function MessagesScreen() {
   if (!session || !profile) {
     return (
       <Screen edges={[]}>
-        <View style={styles.signedOutIcon}><MessageCircle size={36} color={colors.primary} /></View>
+        <StepIllustration step={2} size={96} />
         <AppText muted>{t('chat.emptyHint')}</AppText>
         <AppText>{t('listing.actionsRequireAccount')}</AppText>
         <Button title={t('auth.signInTitle')} onPress={() => router.push({ pathname: '/entrar', params: { next: '/mensajes' } })} />
@@ -74,7 +74,7 @@ function ConversationList({ userId }: { userId: string }) {
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       ListEmptyComponent={
         <View style={styles.empty}>
-          <FadeInItem style={styles.emptyIcon}><MessageCircle size={40} color={colors.primary} /></FadeInItem>
+          <FadeInItem><StepIllustration step={2} size={112} /></FadeInItem>
           <AppText variant="h3" style={{ textAlign: 'center' }}>{t('chat.empty')}</AppText>
           <AppText muted style={{ textAlign: 'center' }}>{t('chat.emptyHint')}</AppText>
           <Button title={t('chat.exploreCta')} onPress={() => router.push('/explorar')} style={{ alignSelf: 'stretch' }} />
@@ -134,6 +134,4 @@ const styles = StyleSheet.create({
   },
   separator: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginLeft: space.lg + 52 + space.md },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: space.xl, gap: space.md },
-  emptyIcon: { width: 80, height: 80, borderRadius: radius.full, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
-  signedOutIcon: { width: 72, height: 72, borderRadius: radius.full, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
 });

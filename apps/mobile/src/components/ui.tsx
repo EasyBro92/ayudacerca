@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { PressableScale, type PressableScaleProps } from '@/components/motion';
 import { haptics } from '@/lib/haptics';
-import { MIN_TOUCH, colors, radius, shadow, space, type } from '@/lib/theme';
+import { MIN_TOUCH, colors, radius, shadow, soft, space, type } from '@/lib/theme';
 
 type Variant = keyof typeof type;
 
@@ -135,17 +135,17 @@ export function Loading({ label }: { label: string }) {
 
 const styles = StyleSheet.create({
   button: {
-    minHeight: MIN_TOUCH + 2, paddingHorizontal: space.lg, borderRadius: radius.md, borderWidth: 2,
+    minHeight: MIN_TOUCH + 2, paddingHorizontal: space.xl, borderRadius: soft.control, borderWidth: 2,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: space.sm,
   },
   buttonText: { fontSize: 17, fontWeight: '700' },
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, ...shadow },
+  card: { backgroundColor: colors.surface, borderRadius: soft.card, borderWidth: 1, borderColor: colors.surfaceMuted, ...shadow, shadowOpacity: 0.05 },
   badge: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 10, paddingVertical: 3, borderRadius: radius.full, alignSelf: 'flex-start' },
   input: {
-    minHeight: MIN_TOUCH, borderWidth: 2, borderColor: colors.border, borderRadius: radius.md, backgroundColor: colors.surface,
+    minHeight: MIN_TOUCH, borderWidth: 2, borderColor: colors.border, borderRadius: soft.control, backgroundColor: colors.surface,
     paddingHorizontal: space.md, fontSize: 17, color: colors.ink,
   },
-  notice: { padding: space.lg, borderRadius: radius.md, gap: space.xs },
+  notice: { padding: space.lg, borderRadius: soft.card, gap: space.xs },
   chip: {
     minHeight: 44, paddingHorizontal: space.lg, borderRadius: radius.full, borderWidth: 1.5, borderColor: colors.border,
     backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: space.xs,

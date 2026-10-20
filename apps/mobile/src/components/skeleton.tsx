@@ -2,7 +2,7 @@ import { type ReactNode, useEffect } from 'react';
 import { type DimensionValue, StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, { cancelAnimation, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { useTranslations } from 'use-intl';
-import { colors, radius, shadow, space } from '@/lib/theme';
+import { colors, radius, shadow, soft, space } from '@/lib/theme';
 
 /**
  * Esqueletos de carga: la forma del contenido con un brillo pulsante (sin brillo si se reduce el movimiento).
@@ -29,16 +29,18 @@ export function Bone({ width = '100%', height = 16, round = radius.sm, style }: 
   return <View style={[{ width, height, borderRadius: round, backgroundColor: colors.surfaceMuted }, style]} />;
 }
 
-export function ListingCardSkeleton() {
+export function ListingRowSkeleton() {
   return (
     <View style={styles.card}>
-      <Bone height={0} round={0} style={{ aspectRatio: 16 / 9, height: undefined }} />
-      <View style={{ padding: space.lg, gap: space.sm }}>
-        <Bone width="35%" height={14} />
-        <Bone width="90%" height={20} />
-        <Bone width="30%" height={22} />
-        <Bone width="60%" height={14} />
+      <View style={{ flexDirection: 'row', gap: space.md }}>
+        <Bone width={48} height={48} round={24} />
+        <View style={{ flex: 1, gap: space.sm }}>
+          <Bone width="35%" height={18} round={radius.full} />
+          <Bone width="90%" height={18} />
+          <Bone width="60%" height={18} />
+        </View>
       </View>
+      <Bone width="50%" height={26} round={radius.full} />
     </View>
   );
 }
@@ -46,7 +48,7 @@ export function ListingCardSkeleton() {
 export function ListingListSkeleton({ count = 3 }: { count?: number }) {
   return (
     <Shimmer style={{ gap: space.lg }}>
-      {Array.from({ length: count }, (_, i) => <ListingCardSkeleton key={i} />)}
+      {Array.from({ length: count }, (_, i) => <ListingRowSkeleton key={i} />)}
     </Shimmer>
   );
 }
@@ -103,6 +105,6 @@ export function CategoryRailSkeleton() {
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', ...shadow },
+  card: { backgroundColor: colors.surface, borderRadius: soft.card, padding: space.lg, gap: space.md, overflow: 'hidden', ...shadow, shadowOpacity: 0.05 },
   row: { flexDirection: 'row', alignItems: 'center', gap: space.md, paddingVertical: space.md },
 });

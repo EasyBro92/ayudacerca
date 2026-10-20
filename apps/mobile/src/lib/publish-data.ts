@@ -22,7 +22,7 @@ export interface DraftData {
 }
 
 export interface WizardCategory {
-  id: number; name: string; icon: string; color: string; warnings: string | null; allowPhotos: boolean;
+  id: number; slug: string; name: string; icon: string; color: string; warnings: string | null; allowPhotos: boolean;
   subcategories: { id: number; name: string }[];
   fields: (CategoryFieldDef & { label: string; optionLabels: Record<string, string> })[];
 }
@@ -30,13 +30,13 @@ export interface WizardCategory {
 export async function loadWizardCatalog(locale: string) {
   const [{ data: cats, error }, { data: munis }] = await Promise.all([
     supabase.from('categories')
-      .select('id, name, icon, color, warnings, allow_photos, sort_order, subcategories ( id, name, sort_order, is_active ), category_fields ( key, label, field_type, options, is_required, validation, sort_order )')
+      .select('id, slug, name, icon, color, warnings, allow_photos, sort_order, subcategories ( id, name, sort_order, is_active ), category_fields ( key, label, field_type, options, is_required, validation, sort_order )')
       .eq('is_active', true).order('sort_order'),
     supabase.from('municipalities').select('id, name, province').order('name'),
   ]);
   if (error) throw error;
   const categories: WizardCategory[] = (cats ?? []).map((c) => ({
-    id: c.id, name: localized(c.name, locale), icon: c.icon, color: c.color, allowPhotos: c.allow_photos,
+    id: c.id, slug: c.slug, name: localized(c.name, locale), icon: c.icon, color: c.color, allowPhotos: c.allow_photos,
     warnings: c.warnings ? localized(c.warnings, locale) : null,
     subcategories: [...c.subcategories].filter((s) => s.is_active).sort((a, b) => a.sort_order - b.sort_order).map((s) => ({ id: s.id, name: localized(s.name, locale) })),
     fields: [...c.category_fields].sort((a, b) => a.sort_order - b.sort_order).map((f) => {
@@ -51,14 +51,20 @@ export async function loadWizardCatalog(locale: string) {
   return { categories, municipalities: munis ?? [] };
 }
 
-/** Recupera el borrador más reciente o crea uno nuevo (RLS: solo los propios). */
-export async function getOrCreateDraft(userId: string, kind: DraftData['kind'] | undefined, fresh: boolean) {
-  if (!fresh) {
+/**
+ * Recupera el borrador más reciente o crea uno nuevo (RLS: solo los propios).
+ * `prefill` (p. ej. el problema escrito en Inicio) siempre crea un borrador nuevo con esos datos.
+ * Sin tipo explícito, un borrador nuevo empieza como petición de ayuda en el paso 1 (se puede cambiar).
+ */
+export async function getOrCreateDraft(userId: string, kind: DraftData['kind'] | undefined, fresh: boolean, prefill?: Pick<DraftData, 'description' | 'categoryId'>) {
+  const hasPrefill = !!prefill && (!!prefill.description || !!prefill.categoryId);
+  if (!fresh && !hasPrefill) {
     const { data } = await supabase.from('listing_drafts').select('id, data, step').order('updated_at', { ascending: false }).limit(1).maybeSingle();
     if (data) return { id: data.id, data: { ...(data.data as DraftData), ...(kind ? { kind } : {}) }, step: data.step };
   }
-  const initial: DraftData = kind ? { kind } : {};
-  const { data, error } = await supabase.from('listing_drafts').insert({ author_id: userId, data: initial as never, step: kind ? 2 : 1 }).select('id, data, step').single();
+  const initial: DraftData = { kind: kind ?? 'request', ...(hasPrefill ? prefill : {}) };
+  const step = kind || hasPrefill ? 2 : 1;
+  const { data, error } = await supabase.from('listing_drafts').insert({ author_id: userId, data: initial as never, step }).select('id, data, step').single();
   if (error) throw error;
   return { id: data.id, data: data.data as DraftData, step: data.step };
 }

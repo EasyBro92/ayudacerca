@@ -1,4 +1,4 @@
-import { type Database, type SearchFilters, localized, toSearchRpcArgs } from '@ayudacerca/core';
+import { type Database, type SearchFilters, limits, localized, toSearchRpcArgs } from '@ayudacerca/core';
 import { supabase } from './supabase';
 
 type SearchRow = Database['public']['Functions']['search_listings']['Returns'][number];
@@ -62,6 +62,45 @@ export async function getCategories(locale: string): Promise<CategoryItem[]> {
   }));
 }
 
+export interface HelperItem { id: string; username: string; displayName: string; avatarPath: string | null; skills: string[]; availableUntil: string }
+
+/** Personas marcadas como «Disponible ahora» (caduca sola: available_until en el futuro). */
+export async function getAvailableHelpers(limit = 12): Promise<HelperItem[]> {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_path, skills, available_until')
+    .gt('available_until', new Date().toISOString())
+    .order('available_until', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data ?? []).map((p) => ({
+    id: p.id, username: p.username, displayName: p.display_name, avatarPath: p.avatar_path ?? null, skills: p.skills ?? [], availableUntil: p.available_until!,
+  }));
+}
+
+export function isAvailableNow(until: string | null | undefined) {
+  return !!until && new Date(until).getTime() > Date.now();
+}
+
+/** «Excel, wordpress , Excel» → ['Excel', 'wordpress']: sin vacíos ni repetidos, 2-30 caracteres y como mucho `limits.profile.skillsMax`. */
+export function parseSkills(text: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of text.split(',')) {
+    const s = raw.trim().replace(/\s+/g, ' ');
+    if (s.length < 2 || s.length > 30 || seen.has(s.toLowerCase())) continue;
+    seen.add(s.toLowerCase());
+    out.push(s);
+    if (out.length === limits.profile.skillsMax) break;
+  }
+  return out;
+}
+
+export async function updateMyHelperProfile(userId: string, patch: { skills?: string[]; available_until?: string | null }) {
+  const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
+  if (error) throw error;
+}
+
 export async function getMunicipalities() {
   const { data, error } = await supabase.from('municipalities').select('slug, name, province').order('name');
   if (error) throw error;
@@ -74,7 +113,7 @@ export async function getListing(slug: string) {
     .select(`id, slug, kind, title, description, modality, price_cents, price_type, desired_date, is_urgent, status, requirements, published_at, author_id,
       category:categories!inner ( slug, name, icon, color, warnings ),
       municipality:municipalities!inner ( name, province ),
-      author:profiles!listings_author_id_fkey ( username, display_name, avatar_path, bio, account_type, identity_verified, professional_verified, rating_avg, rating_count, completed_services, created_at ),
+      author:profiles!listings_author_id_fkey ( username, display_name, avatar_path, bio, skills, available_until, account_type, identity_verified, professional_verified, rating_avg, rating_count, completed_services, created_at ),
       images:listing_images ( path, position, alt )`)
     .eq('slug', slug)
     .maybeSingle();

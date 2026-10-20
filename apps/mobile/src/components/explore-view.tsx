@@ -6,27 +6,37 @@ import { Modal, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react
 import Animated, { Extrapolation, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocale, useTranslations } from 'use-intl';
-import { ListingCard } from '@/components/listing-card';
+import { HelperIllustration } from '@/components/illustrations';
+import { ListingRow } from '@/components/listing-row';
 import { FadeInItem } from '@/components/motion';
 import { ListingListSkeleton } from '@/components/skeleton';
 import { AppText, Button, CenteredState, Chip, Loading } from '@/components/ui';
 import { type CategoryItem, type ListingCardData, getCategories, getMunicipalities, searchListings } from '@/lib/data';
-import { MIN_TOUCH, colors, radius, shadow, space } from '@/lib/theme';
+import { MIN_TOUCH, colors, radius, shadow, soft, space, webTabInset } from '@/lib/theme';
 
 const PAGE = 20;
 const SORT_KEYS: Record<SortOption, string> = {
   relevance: 'sortRelevance', recent: 'sortRecent', nearest: 'sortNearest', price_asc: 'sortPrice', rating: 'sortRating', response: 'sortResponse',
 };
 
-export default function ExploreScreen() {
+/**
+ * Búsqueda de anuncios con filtros.
+ * - `explore`: todo (ruta /explorar, apilada sobre las pestañas, con su propia cabecera).
+ * - `help`: pestaña «Ayudar», solo peticiones de gente que necesita una mano, con invitación a ofrecer ayuda.
+ */
+export function ExploreView({ mode }: { mode: 'explore' | 'help' }) {
   const t = useTranslations('explore');
+  const tHome = useTranslations('home');
+  const help = mode === 'help';
+  // En «Ayudar» el tipo es siempre «petición», también al quitar filtros
+  const fix = (f: SearchFilters): SearchFilters => (help ? { ...f, kind: 'request' } : f);
   const tKinds = useTranslations('kinds');
   const tCommon = useTranslations('common');
   const locale = useLocale();
   const params = useLocalSearchParams<Record<string, string>>();
   // Los parámetros llegan como objeto nuevo en cada render: se comparan por contenido para no relanzar la búsqueda
   const paramsKey = JSON.stringify(params);
-  const initial = useMemo(() => parseSearchParams(JSON.parse(paramsKey) as Record<string, string>), [paramsKey]);
+  const initial = useMemo(() => fix(parseSearchParams(JSON.parse(paramsKey) as Record<string, string>)), [paramsKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [filters, setFilters] = useState<SearchFilters>(initial);
   const [text, setText] = useState(initial.q ?? '');
@@ -66,7 +76,7 @@ export default function ExploreScreen() {
     return () => { cancelled = true; };
   }, [currentKey, filtersKey, locale]);
 
-  const update = (patch: Partial<SearchFilters>) => setFilters((f) => ({ ...f, ...patch, page: 1 }));
+  const update = (patch: Partial<SearchFilters>) => setFilters((f) => fix({ ...f, ...patch, page: 1 }));
   const loadMore = () => {
     if (loadingMore || loading || items.length >= total || items.length >= limits.search.maxOffset) return;
     setLoadingMore(true);
@@ -74,12 +84,13 @@ export default function ExploreScreen() {
       .then((r) => setExtra((prev) => [...prev, ...r.items]), () => undefined)
       .finally(() => setLoadingMore(false));
   };
-  const active = activeFilterCount(filters);
+  // En «Ayudar» el tipo fijo no cuenta como filtro elegido
+  const active = activeFilterCount(help ? { ...filters, kind: null } : filters);
   const category = categories.find((c) => c.slug === filters.category);
 
   // Cabecera fija: el título se desliza hacia arriba al hacer scroll y el buscador se queda visible
-  const [headerHeight, setHeaderHeight] = useState(150);
-  const [titleHeight, setTitleHeight] = useState(48);
+  const [headerHeight, setHeaderHeight] = useState(help ? 150 : 90);
+  const [titleHeight, setTitleHeight] = useState(help ? 48 : 0);
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((e) => { scrollY.set(e.contentOffset.y); });
   const headerStyle = useAnimatedStyle(() => {
@@ -92,10 +103,12 @@ export default function ExploreScreen() {
   const titleStyle = useAnimatedStyle(() => ({ opacity: interpolate(scrollY.get(), [0, titleHeight * 0.7], [1, 0], Extrapolation.CLAMP) }));
 
   const stickyHeader = (
-    <Animated.View style={[styles.sticky, headerStyle]} onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
-      <Animated.View style={titleStyle} onLayout={(e) => setTitleHeight(e.nativeEvent.layout.height)}>
-        <AppText variant="h1" style={{ paddingBottom: space.md }}>{t('title')}</AppText>
-      </Animated.View>
+    <Animated.View style={[styles.sticky, help && { paddingTop: space.lg + webTabInset }, headerStyle]} onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
+      {help ? (
+        <Animated.View style={titleStyle} onLayout={(e) => setTitleHeight(e.nativeEvent.layout.height)}>
+          <AppText variant="h1" style={{ paddingBottom: space.md }}>{t('helpHeading')}</AppText>
+        </Animated.View>
+      ) : null}
       <View style={styles.searchBox}>
         <Search color={colors.inkMuted} size={22} />
         <TextInput
@@ -114,11 +127,23 @@ export default function ExploreScreen() {
 
   const header = (
     <View style={{ gap: space.md, paddingBottom: space.md }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
-        <Chip label={t('all')} selected={filters.kind === null} onPress={() => update({ kind: null })} />
-        <Chip label={tKinds('offer')} selected={filters.kind === 'offer'} onPress={() => update({ kind: 'offer' })} />
-        <Chip label={tKinds('request')} selected={filters.kind === 'request'} onPress={() => update({ kind: 'request' })} />
-      </ScrollView>
+      {help ? (
+        <View style={styles.invite}>
+          <HelperIllustration size={72} />
+          <View style={{ flex: 1, gap: space.sm }}>
+            <AppText style={{ fontWeight: '700' }}>{tHome('helperCtaTitle')}</AppText>
+            <AppText variant="small">{tHome('requestsText')}</AppText>
+            <Button title={tHome('helperCta')} variant="accent" style={{ alignSelf: 'flex-start' }}
+              onPress={() => router.push({ pathname: '/publicar', params: { tipo: 'ofrezco' } })} />
+          </View>
+        </View>
+      ) : (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
+          <Chip label={t('all')} selected={filters.kind === null} onPress={() => update({ kind: null })} />
+          <Chip label={tKinds('offer')} selected={filters.kind === 'offer'} onPress={() => update({ kind: 'offer' })} />
+          <Chip label={tKinds('request')} selected={filters.kind === 'request'} onPress={() => update({ kind: 'request' })} />
+        </ScrollView>
+      )}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: space.sm }}>
         <Chip label={t('allCategories')} selected={!filters.category} onPress={() => update({ category: null, subcategory: null })} />
         {/* La categoría elegida va primero para que siempre se vea */}
@@ -140,13 +165,13 @@ export default function ExploreScreen() {
   );
 
   return (
-    <SafeAreaView edges={['top']} style={{ flex: 1, backgroundColor: colors.background }}>
+    <SafeAreaView edges={help ? ['top'] : []} style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{ flex: 1, overflow: 'hidden' }}>
       <Animated.FlatList
         data={loading ? [] : items}
         keyExtractor={(l) => l.id}
-        renderItem={({ item, index }) => <FadeInItem index={index}><ListingCard listing={item} /></FadeInItem>}
-        ItemSeparatorComponent={() => <View style={{ height: space.lg }} />}
+        renderItem={({ item, index }) => <FadeInItem index={index}><ListingRow listing={item} /></FadeInItem>}
+        ItemSeparatorComponent={() => <View style={{ height: space.md }} />}
         ListHeaderComponent={header}
         onScroll={onScroll}
         scrollEventThrottle={16}
@@ -155,7 +180,7 @@ export default function ExploreScreen() {
         ) : (
           <CenteredState title={t('emptyTitle')} text={t('emptyText')} action={
             <View style={{ gap: space.sm, alignSelf: 'stretch' }}>
-              {active > 0 || filters.q ? <Button title={t('emptyClear')} variant="outline" onPress={() => { setText(''); setFilters(DEFAULT_FILTERS); }} /> : null}
+              {active > 0 || filters.q ? <Button title={t('emptyClear')} variant="outline" onPress={() => { setText(''); setFilters(fix(DEFAULT_FILTERS)); }} /> : null}
               <Button title={t('emptyPublish')} variant="accent" onPress={() => router.push({ pathname: '/publicar', params: { tipo: 'necesito' } })} />
             </View>
           } />
@@ -266,7 +291,8 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 0, left: 0, right: 0, paddingHorizontal: space.lg, paddingTop: space.lg, paddingBottom: space.md,
     backgroundColor: colors.background, ...shadow, shadowOpacity: 0, elevation: 0,
   },
-  searchBox: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 56, paddingHorizontal: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 2, borderColor: colors.border },
+  searchBox: { flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 56, paddingHorizontal: space.lg, backgroundColor: colors.surface, borderRadius: soft.block, borderWidth: 2, borderColor: colors.border },
+  invite: { flexDirection: 'row', gap: space.md, alignItems: 'center', padding: space.lg, backgroundColor: colors.accentSoft, borderRadius: soft.block },
   searchInput: { flex: 1, fontSize: 17, color: colors.ink, minHeight: MIN_TOUCH },
   modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.lg, paddingVertical: space.md, borderBottomWidth: 1, borderBottomColor: colors.border },
   modalFooter: { flexDirection: 'row', gap: space.sm, padding: space.lg, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.surface },

@@ -1,10 +1,20 @@
 import { brand } from '@ayudacerca/core';
+import { Platform } from 'react-native';
 
 /** Tema de la app: los mismos tokens que la web (packages/core/src/brand.ts). */
 export const colors = brand.colors;
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 export const radius = brand.radius;
+
+/** Esquinas «amables» del rediseño ilustrado: tarjetas y bloques más redondeados que en la web. */
+export const soft = { card: 22, block: 28, control: 18 } as const;
+
+/** En la versión web (pruebas y vista previa) la barra de pestañas flota arriba: se deja hueco debajo. */
+export const webTabInset = Platform.OS === 'web' ? 72 : 0;
+
+/** Verde del punto «Disponible ahora» (sobre blanco: contraste 3:1 para elementos gráficos). */
+export const onlineDot = '#16A34A';
 
 /** Tamaños de texto. Respetan el tamaño de letra del sistema (accesibilidad). */
 export const type = {

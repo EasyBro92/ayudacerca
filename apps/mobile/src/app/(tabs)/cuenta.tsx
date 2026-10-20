@@ -1,23 +1,25 @@
-import { brand } from '@ayudacerca/core';
+import { brand, limits } from '@ayudacerca/core';
 import { LOCALE_NAMES, LOCALES } from '@ayudacerca/core/i18n';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useFormatter, useLocale, useTranslations } from 'use-intl';
 import { Avatar } from '@/components/avatar';
-import { ListingCard } from '@/components/listing-card';
+import { OnlineDot, SkillChips } from '@/components/helpers';
+import { ListingRow } from '@/components/listing-row';
 import { FadeInItem } from '@/components/motion';
 import { Screen } from '@/components/screen';
-import { AppText, Button, Card, Chip, Notice } from '@/components/ui';
+import { AppText, Button, Card, Chip, Notice, TextField } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { confirmAction } from '@/lib/confirm';
-import { type ListingCardData, getFavoriteListings } from '@/lib/data';
+import { type ListingCardData, getFavoriteListings, isAvailableNow, parseSkills, updateMyHelperProfile } from '@/lib/data';
+import { haptics } from '@/lib/haptics';
 import { webUrl } from '@/lib/env';
 import { useAppLocale } from '@/lib/i18n';
 import { supabase } from '@/lib/supabase';
-import { MIN_TOUCH, colors, space } from '@/lib/theme';
+import { MIN_TOUCH, colors, soft, space, webTabInset } from '@/lib/theme';
 
 const LEGAL = [['terms', 'terms'], ['privacy', 'privacy'], ['cookies', 'cookies'], ['communityRules', 'community_rules'], ['legalNotice', 'legal_notice']] as const;
 
@@ -83,7 +85,7 @@ export default function AccountScreen() {
 
   if (!session || !profile) {
     return (
-      <Screen>
+      <Screen contentStyle={{ paddingTop: space.lg + webTabInset }}>
         <AppText variant="h1">{t('account.welcomeTitle', { brand: brand.name })}</AppText>
         <AppText muted>{t('account.welcomeText')}</AppText>
         <Button title={t('auth.signInTitle')} onPress={() => router.push('/entrar')} />
@@ -96,7 +98,7 @@ export default function AccountScreen() {
   }
 
   return (
-    <Screen onRefresh={load}>
+    <Screen onRefresh={load} contentStyle={{ paddingTop: space.lg + webTabInset }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
         <Avatar name={profile.display_name} path={profile.avatar_path} size={64} />
         <View style={{ flex: 1 }}>
@@ -112,8 +114,10 @@ export default function AccountScreen() {
         </Notice>
       ) : null}
 
+      <HelperCard key={profile.id} userId={profile.id} availableUntil={profile.available_until} skills={profile.skills} onSaved={refreshProfile} />
+
       <AppText variant="h2">{t('account.favorites')}</AppText>
-      {favorites.length === 0 ? <AppText muted>{t('account.noFavorites')}</AppText> : favorites.map((l, i) => <FadeInItem key={l.id} index={i}><ListingCard listing={l} /></FadeInItem>)}
+      {favorites.length === 0 ? <AppText muted>{t('account.noFavorites')}</AppText> : favorites.map((l, i) => <FadeInItem key={l.id} index={i}><ListingRow listing={l} /></FadeInItem>)}
 
       {languagePicker}
       {legalLinks}
@@ -129,3 +133,93 @@ export default function AccountScreen() {
     </Screen>
   );
 }
+
+/** «¿Puedes ayudar ahora?» (disponible unas horas, se apaga sola) y «Lo que se te da bien». */
+function HelperCard({ userId, availableUntil, skills, onSaved }: { userId: string; availableUntil: string | null; skills: string[]; onSaved: () => Promise<void> }) {
+  const t = useTranslations('account');
+  const format = useFormatter();
+  const [until, setUntil] = useState(availableUntil);
+  const [busy, setBusy] = useState(false);
+  const [skillsText, setSkillsText] = useState(skills.join(', '));
+  const [saved, setSaved] = useState<string[]>(skills);
+  const [savingSkills, setSavingSkills] = useState(false);
+  const [message, setMessage] = useState<{ tone: 'success' | 'danger'; text: string } | null>(null);
+  const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
+  const available = isAvailableNow(until);
+
+  async function toggle(on: boolean) {
+    setBusy(true);
+    setMessage(null);
+    const next = on ? new Date(Date.now() + limits.profile.availableHours * 3_600_000).toISOString() : null;
+    try {
+      await updateMyHelperProfile(userId, { available_until: next });
+      setUntil(next);
+      haptics.success();
+      void onSaved();
+    } catch {
+      setMessage({ tone: 'danger', text: tErrors('unavailable') });
+    }
+    setBusy(false);
+  }
+
+  async function saveSkills() {
+    const list = parseSkills(skillsText);
+    setSavingSkills(true);
+    setMessage(null);
+    try {
+      await updateMyHelperProfile(userId, { skills: list });
+      setSaved(list);
+      setSkillsText(list.join(', '));
+      setMessage({ tone: 'success', text: t('skillsSaved') });
+      haptics.success();
+      void onSaved();
+    } catch {
+      setMessage({ tone: 'danger', text: tErrors('unavailable') });
+    }
+    setSavingSkills(false);
+  }
+
+  return (
+    <View style={styles.helper}>
+      <View style={styles.availableRow}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <AppText variant="h3">{t('availableTitle')}</AppText>
+          <AppText variant="small">{t('availableText', { hours: limits.profile.availableHours })}</AppText>
+        </View>
+      </View>
+      {available && until ? (
+        <View style={styles.until} accessibilityLiveRegion="polite">
+          <OnlineDot />
+          <AppText style={{ fontWeight: '700', color: colors.success, flex: 1 }}>{t('availableUntil', { time: format.dateTime(new Date(until), { hour: '2-digit', minute: '2-digit' }) })}</AppText>
+        </View>
+      ) : null}
+      <Button
+        title={available ? t('availableOff') : t('availableOn')}
+        variant={available ? 'outline' : 'primary'}
+        loading={busy}
+        onPress={() => void toggle(!available)}
+      />
+
+      <View style={styles.divider} />
+      <TextField
+        label={t('skillsTitle')}
+        help={t('skillsText')}
+        value={skillsText}
+        onChangeText={(v) => { setSkillsText(v); setMessage(null); }}
+        autoCapitalize="none"
+        accessibilityHint={t('skillsText')}
+      />
+      <SkillChips skills={saved} max={limits.profile.skillsMax} />
+      <Button title={savingSkills ? tCommon('loading') : t('skillsSave')} variant="outline" loading={savingSkills} onPress={() => void saveSkills()} />
+      {message ? <Notice tone={message.tone}>{message.text}</Notice> : null}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  helper: { gap: space.md, padding: space.xl, backgroundColor: colors.primarySoft, borderRadius: soft.block },
+  availableRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  until: { flexDirection: 'row', alignItems: 'center', gap: space.sm, padding: space.md, backgroundColor: colors.surface, borderRadius: soft.control },
+  divider: { height: 1, backgroundColor: colors.border, marginVertical: space.xs },
+});

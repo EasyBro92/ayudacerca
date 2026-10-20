@@ -9,6 +9,8 @@ export interface Profile {
   avatar_path: string | null;
   email_verified: boolean;
   status: string;
+  skills: string[];
+  available_until: string | null;
 }
 
 interface AuthState {
@@ -30,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = useCallback(async (userId: string | undefined) => {
     if (!userId) { setProfile(null); return; }
-    const { data } = await supabase.from('profiles').select('id, username, display_name, avatar_path, email_verified, status').eq('id', userId).maybeSingle();
+    const { data } = await supabase.from('profiles').select('id, username, display_name, avatar_path, email_verified, status, skills, available_until').eq('id', userId).maybeSingle();
     setProfile(data ?? null);
   }, []);
 

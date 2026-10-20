@@ -10,15 +10,17 @@ import { Avatar } from '@/components/avatar';
 import { CategoryIcon } from '@/components/category-icon';
 import { ContactSheet } from '@/components/contact-sheet';
 import { FavoriteButton } from '@/components/favorite-button';
+import { AvailableBadge, OnlineDot, SkillChips } from '@/components/helpers';
+import { HowChip, KindPill } from '@/components/listing-row';
 import { FadeInItem } from '@/components/motion';
 import { ReportSheet } from '@/components/report-sheet';
 import { DetailSkeleton } from '@/components/skeleton';
 import { AppText, Badge, Button, Card, CenteredState, Notice } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { getMyConversationForListing } from '@/lib/chat';
-import { getListing } from '@/lib/data';
+import { getListing, isAvailableNow } from '@/lib/data';
 import { storageUrl, webUrl } from '@/lib/env';
-import { colors, radius, shadowRaised, space } from '@/lib/theme';
+import { colors, radius, shadowRaised, soft, space } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
 export default function ListingScreen() {
@@ -55,6 +57,7 @@ export default function ListingScreen() {
   const statusNotice = ({ paused: 'statusPaused', reserved: 'statusReserved', completed: 'statusCompleted', expired: 'statusExpired' } as const)[listing.status as 'paused'];
   const share = () => Share.share({ message: `${listing.title} · ${brand.name}\n${webUrl(`/anuncios/${listing.slug}`, locale)}` });
   const contactable = listing.status === 'published';
+  const authorAvailable = isAvailableNow(listing.author.available_until);
   const contact = () => {
     if (existingId) { router.push({ pathname: '/conversacion/[id]', params: { id: existingId } }); return; }
     if (!session) { router.push({ pathname: '/entrar', params: { next: `/anuncio/${listing.slug}` } }); return; }
@@ -74,7 +77,7 @@ export default function ListingScreen() {
           </ScrollView>
         ) : (
           <View style={[styles.noPhoto, { backgroundColor: `${listing.category.color}14` }]}>
-            <CategoryIcon icon={listing.category.icon} color={listing.category.color} size={72} />
+            <CategoryIcon icon={listing.category.icon} color={listing.category.color} size={88} round />
           </View>
         )}
 
@@ -82,7 +85,7 @@ export default function ListingScreen() {
           {isOwner ? <Notice>{t('listing.ownListing')}</Notice> : null}
           {statusNotice ? <Notice tone="warning">{t(`listing.${statusNotice}`)}</Notice> : null}
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-            <Badge label={t(`kinds.${listing.kind}`)} tone={listing.kind === 'offer' ? 'primary' : 'accent'} />
+            <KindPill kind={listing.kind} />
             <Badge label={categoryName} />
             {listing.is_urgent ? <Badge label={t('common.urgent')} tone="warning" /> : null}
           </View>
@@ -90,8 +93,9 @@ export default function ListingScreen() {
           <AppText variant="h1" style={{ fontSize: 28 }}>{price}</AppText>
           <View style={styles.row}>
             <MapPin size={18} color={colors.inkMuted} />
-            <AppText muted>{listing.municipality.name} ({listing.municipality.province}) · {t(`modalities.${listing.modality}`)}</AppText>
+            <AppText muted>{listing.municipality.name} ({listing.municipality.province})</AppText>
           </View>
+          <HowChip modality={listing.modality} />
           {listing.published_at ? <AppText muted variant="small">{t('listing.published', { date: safeRelative(listing.published_at, locale) })}</AppText> : null}
           <View style={styles.row}>
             <Info size={16} color={colors.inkMuted} />
@@ -126,9 +130,13 @@ export default function ListingScreen() {
           <Card style={{ padding: space.lg, gap: space.md }}>
             <AppText variant="caption" muted style={{ fontWeight: '700', textTransform: 'uppercase' }}>{t('listing.postedBy')}</AppText>
             <View style={[styles.row, { gap: space.md }]}>
-              <Avatar name={listing.author.display_name} path={listing.author.avatar_path} size={56} />
+              <View>
+                <Avatar name={listing.author.display_name} path={listing.author.avatar_path} size={56} />
+                {authorAvailable ? <View style={{ position: 'absolute', right: 0, bottom: 0 }}><OnlineDot size={16} /></View> : null}
+              </View>
               <View style={{ flex: 1 }}>
                 <AppText variant="h3">{listing.author.display_name}</AppText>
+                {authorAvailable ? <AvailableBadge /> : null}
                 <AppText muted variant="small">{listing.author.account_type === 'professional' ? t('listing.professional') : t('listing.individual')}</AppText>
                 <View style={styles.row}>
                   {listing.author.rating_count > 0 ? <Star size={14} color={colors.warning} fill={colors.warning} /> : null}
@@ -137,6 +145,12 @@ export default function ListingScreen() {
               </View>
             </View>
             {listing.author.bio ? <AppText muted>{listing.author.bio}</AppText> : null}
+            {listing.author.skills?.length ? (
+              <View style={{ gap: space.xs }}>
+                <AppText variant="small" style={{ fontWeight: '700' }}>{t('helpers.skills')}</AppText>
+                <SkillChips skills={listing.author.skills} max={12} />
+              </View>
+            ) : null}
             {listing.author.identity_verified ? (
               <View style={{ gap: 4 }}>
                 <Badge label={t('listing.identityVerified')} tone="primary" icon={<BadgeCheck size={16} color={colors.primaryStrong} />} />
@@ -188,8 +202,8 @@ function safeRelative(date: string, locale: string) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' },
-  noPhoto: { aspectRatio: 16 / 9, alignItems: 'center', justifyContent: 'center' },
-  tips: { backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: space.lg, gap: space.sm },
+  noPhoto: { aspectRatio: 2.4, alignItems: 'center', justifyContent: 'center', margin: space.lg, marginBottom: 0, borderRadius: soft.block },
+  tips: { backgroundColor: colors.primarySoft, borderRadius: soft.block, padding: space.lg, gap: space.sm },
   proposal: { gap: space.xs },
   bar: {
     position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center', gap: space.sm,

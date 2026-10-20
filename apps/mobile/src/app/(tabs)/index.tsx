@@ -1,133 +1,183 @@
+import { brand, problemExamples, suggestCategories } from '@ayudacerca/core';
 import { router } from 'expo-router';
-import { BadgeCheck, CircleCheck, Lock, MessageCircle, MonitorSmartphone, PenLine, Search, Video } from 'lucide-react-native';
-import { useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ChevronRight, Search } from 'lucide-react-native';
+import { type ReactNode, useState } from 'react';
+import { StyleSheet, Text, TextInput, View } from 'react-native';
 import { useLocale, useTranslations } from 'use-intl';
 import { CategoryIcon } from '@/components/category-icon';
-import { ListingCard } from '@/components/listing-card';
+import { AvailableHelpers } from '@/components/helpers';
+import { HelperIllustration, HeroIllustration, LogoMark, StepIllustration } from '@/components/illustrations';
+import { ListingRow } from '@/components/listing-row';
 import { FadeInItem, PressableScale } from '@/components/motion';
 import { Screen } from '@/components/screen';
-import { CategoryRailSkeleton, ListingListSkeleton } from '@/components/skeleton';
-import { AppText, Button, Card, CenteredState, Chip } from '@/components/ui';
-import { type CategoryItem, getCategories, recentListings } from '@/lib/data';
-import { MIN_TOUCH, colors, radius, shadow, space } from '@/lib/theme';
+import { ListingListSkeleton } from '@/components/skeleton';
+import { AppText, Button, CenteredState, Chip } from '@/components/ui';
+import { type CategoryItem, getAvailableHelpers, getCategories, recentListings } from '@/lib/data';
+import { MIN_TOUCH, colors, shadow, soft, space, webTabInset } from '@/lib/theme';
 import { useAsync } from '@/lib/use-async';
 
-/** Ancho de cada tarjeta de categoría + separación: el carrusel se detiene en cada una. */
-const CATEGORY_CARD = 148;
-const CATEGORY_GAP = space.sm;
+const ROWS = 3;
 
 export default function HomeScreen() {
   const t = useTranslations();
   const locale = useLocale();
-  const [query, setQuery] = useState('');
-  const [tab, setTab] = useState<'offer' | 'request'>('offer');
+  const [problem, setProblem] = useState('');
+  const [picked, setPicked] = useState<string | null>(null);
   const { data, loading, error, refreshing, refresh, reload } = useAsync(
     async () => {
       // Solo categorías activas (las presenciales están ocultas): nada de listas fijas en la app
-      const [categories, offers, requests] = await Promise.all([getCategories(locale), recentListings('offer', locale), recentListings('request', locale)]);
-      return { categories, offers, requests };
+      const [categories, offers, requests, helpers] = await Promise.all([
+        getCategories(locale), recentListings('offer', locale), recentListings('request', locale),
+        getAvailableHelpers().catch(() => []),
+      ]);
+      return { categories, offers: offers.slice(0, ROWS), requests: requests.slice(0, ROWS), helpers };
     },
     [locale],
   );
 
-  const search = () => router.push({ pathname: '/explorar', params: query.trim() ? { q: query.trim() } : {} });
-  const listings = data ? (tab === 'offer' ? data.offers : data.requests) : [];
+  const bySlug = new Map((data?.categories ?? []).map((c) => [c.slug, c]));
+  const suggested = suggestCategories(problem).filter((s) => bySlug.has(s));
+  const chips = picked && !suggested.includes(picked) && bySlug.has(picked) ? [picked, ...suggested] : suggested;
+  const category = picked ?? suggested[0] ?? null;
+  const text = problem.trim();
+
+  const ask = () => router.push({
+    pathname: '/publicar',
+    params: { tipo: 'necesito', ...(text ? { texto: text } : {}), ...(category ? { categoria: category } : {}) },
+  });
+  // Con categoría se filtra por ella (una frase entera como búsqueda casi nunca encuentra nada)
+  const findHelpers = () => router.push({
+    pathname: '/explorar',
+    params: { tipo: 'ofrecen', ...(category ? { categoria: category } : text ? { q: text.slice(0, 100) } : {}) },
+  });
 
   return (
-    <Screen refreshing={refreshing} onRefresh={refresh}>
+    <Screen refreshing={refreshing} onRefresh={refresh} contentStyle={{ gap: space.xl, paddingTop: space.lg + webTabInset }}>
+      <View style={styles.brandRow}>
+        <LogoMark size={34} />
+        <Text maxFontSizeMultiplier={1.6} style={styles.brand}>{brand.name}</Text>
+      </View>
+
       <FadeInItem style={styles.hero}>
-        <View style={styles.heroIcon}><MonitorSmartphone size={26} color={colors.onPrimary} /></View>
-        <AppText variant="h1" style={{ color: colors.ink }}>{t('home.heroTitle')}</AppText>
-        <AppText muted>{t('home.heroSubtitle')}</AppText>
-        <View style={styles.searchBox}>
-          <Search color={colors.inkMuted} size={22} />
-          <TextInput
-            value={query}
-            onChangeText={setQuery}
-            onSubmitEditing={search}
-            returnKeyType="search"
-            placeholder={t('home.searchWhatPlaceholder')}
-            placeholderTextColor={colors.inkMuted}
-            accessibilityLabel={t('home.searchWhat')}
-            maxFontSizeMultiplier={2}
-            style={styles.searchInput}
-          />
-        </View>
-        <Button title={t('home.searchButton')} variant="accent" onPress={search} />
-        <View style={{ flexDirection: 'row', gap: space.sm }}>
-          <Button style={{ flex: 1 }} title={t('home.needHelp')} onPress={() => router.push({ pathname: '/publicar', params: { tipo: 'necesito' } })} />
-          <Button style={{ flex: 1 }} title={t('home.offerHelp')} variant="outline" onPress={() => router.push({ pathname: '/publicar', params: { tipo: 'ofrezco' } })} />
-        </View>
+        <View style={{ alignItems: 'center' }}><HeroIllustration width={260} /></View>
+        <AppText variant="h1">{t('home.heroTitle')}</AppText>
+        <AppText style={{ color: colors.ink }}>{t('home.heroSubtitle')}</AppText>
       </FadeInItem>
+
+      <FadeInItem index={1} style={styles.problem}>
+        <AppText variant="h2" nativeID="problem-label">{t('home.problemLabel')}</AppText>
+        <TextInput
+          value={problem}
+          onChangeText={setProblem}
+          multiline
+          maxLength={500}
+          placeholder={t('home.problemPlaceholder')}
+          placeholderTextColor={colors.inkMuted}
+          accessibilityLabel={t('home.problemLabel')}
+          accessibilityHint={t('home.problemHint')}
+          maxFontSizeMultiplier={2}
+          style={styles.problemInput}
+        />
+        <AppText variant="small" muted>{t('home.problemHint')}</AppText>
+        {chips.length > 0 ? (
+          <View style={{ gap: space.sm }} accessibilityLiveRegion="polite">
+            <AppText style={{ fontWeight: '700' }}>{t('home.suggestedTitle')}</AppText>
+            <View style={styles.wrap}>
+              {chips.map((slug) => {
+                const c = bySlug.get(slug)!;
+                return <Chip key={slug} label={c.name} selected={category === slug} onPress={() => setPicked(slug)}
+                  icon={<CategoryIcon icon={c.icon} color={c.color} size={26} round />} />;
+              })}
+            </View>
+          </View>
+        ) : null}
+        <Button title={t('home.askCtaShort')} variant="accent" onPress={ask} />
+        <Button title={t('home.findHelpers')} variant="outline" icon={<Search size={20} color={colors.primary} />} onPress={findHelpers} />
+      </FadeInItem>
+
+      <View style={{ gap: space.md }}>
+        <AppText variant="h3">{t('home.examplesTitle')}</AppText>
+        <View style={styles.wrap}>
+          {problemExamples.map((e) => (
+            <PressableScale key={e.key} accessibilityRole="button" scaleTo={0.95} style={styles.example}
+              onPress={() => { setProblem(t(`home.examples.${e.key}`)); setPicked(e.category); }}>
+              <Text maxFontSizeMultiplier={1.6} style={styles.exampleText}>{t(`home.examples.${e.key}`)}</Text>
+            </PressableScale>
+          ))}
+        </View>
+      </View>
 
       {error && !data ? (
         <CenteredState title={t('common.errorTitle')} text={t('common.errorText')} action={<Button title={t('common.retry')} onPress={reload} />} />
       ) : (
         <>
-          <View style={{ gap: space.md }}>
-            <AppText variant="h2">{t('home.categoriesTitle')}</AppText>
-            {loading || !data ? <CategoryRailSkeleton /> : (
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                snapToInterval={CATEGORY_CARD + CATEGORY_GAP}
-                snapToAlignment="start"
-                decelerationRate="fast"
-                // El carrusel llega hasta los bordes de la pantalla
-                style={{ marginHorizontal: -space.lg }}
-                contentContainerStyle={{ gap: CATEGORY_GAP, paddingHorizontal: space.lg, paddingVertical: space.xs }}
-              >
-                {data.categories.map((c, i) => <CategoryCard key={c.slug} category={c} index={i} />)}
-              </ScrollView>
-            )}
-          </View>
+          <Section title={t('home.availableTitle')} text={t('home.availableText')}>
+            <AvailableHelpers helpers={data?.helpers} loading={loading || !data} />
+          </Section>
 
-          <View style={{ gap: space.md }}>
-            <AppText variant="h2">{t('home.recentTitle')}</AppText>
-            <View style={{ flexDirection: 'row', gap: space.sm }} accessibilityRole="tablist">
-              <Chip label={t('home.tabOffers')} selected={tab === 'offer'} onPress={() => setTab('offer')} />
-              <Chip label={t('home.tabRequests')} selected={tab === 'request'} onPress={() => setTab('request')} />
+          <Section title={t('home.requestsTitle')} text={t('home.requestsText')}>
+            {loading || !data ? <ListingListSkeleton count={2} /> : data.requests.map((l, i) => <FadeInItem key={l.id} index={i}><ListingRow listing={l} /></FadeInItem>)}
+            <SeeAll label={t('home.seeAllRequests')} onPress={() => router.push({ pathname: '/explorar', params: { tipo: 'necesitan' } })} />
+          </Section>
+
+          <Section title={t('home.offersTitle')}>
+            {loading || !data ? <ListingListSkeleton count={2} /> : data.offers.map((l, i) => <FadeInItem key={l.id} index={i}><ListingRow listing={l} /></FadeInItem>)}
+            <SeeAll label={t('home.seeAllOffers')} onPress={() => router.push({ pathname: '/explorar', params: { tipo: 'ofrecen' } })} />
+          </Section>
+
+          <Section title={t('home.categoriesTitle')}>
+            <View style={styles.categories}>
+              {(data?.categories ?? []).map((c, i) => <CategoryRow key={c.slug} category={c} index={i} />)}
             </View>
-            {loading || !data ? <ListingListSkeleton count={2} /> : listings.map((l, i) => (
-              // La clave incluye la pestaña para que al cambiar entren de nuevo, escalonadas
-              <FadeInItem key={`${tab}:${l.id}`} index={i}><ListingCard listing={l} /></FadeInItem>
-            ))}
-            <Button title={t('common.seeAll')} variant="outline" onPress={() => router.push('/explorar')} />
-          </View>
-
-          <Card style={{ padding: space.lg, gap: space.md }}>
-            <AppText variant="h2">{t('home.howTitle')}</AppText>
-            {([[PenLine, 'how1'], [MessageCircle, 'how2'], [Video, 'how4']] as const).map(([Icon, key], i) => (
-              <View key={key} style={{ flexDirection: 'row', gap: space.md }}>
-                <View style={styles.step}><Icon color={colors.primary} size={20} /></View>
-                <View style={{ flex: 1 }}>
-                  <AppText style={{ fontWeight: '700' }}>{i + 1}. {t(`home.${key}Title`)}</AppText>
-                  <AppText muted variant="small">{t(`home.${key}Text`)}</AppText>
-                </View>
-              </View>
-            ))}
-          </Card>
-
-          <Card style={{ padding: space.lg, gap: space.md }}>
-            <AppText variant="h2">{t('home.safetyTitle')}</AppText>
-            {([[Lock, 'safety1'], [BadgeCheck, 'safety2'], [CircleCheck, 'safety3']] as const).map(([Icon, key]) => (
-              <View key={key} style={{ flexDirection: 'row', gap: space.md }}>
-                <Icon color={colors.primary} size={24} />
-                <View style={{ flex: 1 }}>
-                  <AppText style={{ fontWeight: '700' }}>{t(`home.${key}Title`)}</AppText>
-                  <AppText muted variant="small">{t(`home.${key}Text`)}</AppText>
-                </View>
-              </View>
-            ))}
-          </Card>
+          </Section>
         </>
       )}
+
+      <View style={styles.steps}>
+        <AppText variant="h2">{t('home.stepsTitle')}</AppText>
+        {([1, 2, 3] as const).map((n) => (
+          <View key={n} style={styles.step}>
+            <StepIllustration step={n} size={68} />
+            <View style={{ flex: 1, gap: 2 }}>
+              <AppText variant="h3">{n}. {t(`home.step${n}Title`)}</AppText>
+              <AppText muted variant="small">{t(`home.step${n}Text`)}</AppText>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.helperCta}>
+        <HelperIllustration size={88} />
+        <AppText variant="h2" style={{ textAlign: 'center' }}>{t('home.helperCtaTitle')}</AppText>
+        <AppText style={{ textAlign: 'center' }}>{t('home.helperCtaText')}</AppText>
+        <Button title={t('home.helperCta')} style={{ alignSelf: 'stretch' }} onPress={() => router.push({ pathname: '/publicar', params: { tipo: 'ofrezco' } })} />
+      </View>
     </Screen>
   );
 }
 
-function CategoryCard({ category: c, index }: { category: CategoryItem; index: number }) {
+function Section({ title, text, children }: { title: string; text?: string; children: ReactNode }) {
+  return (
+    <View style={{ gap: space.md }}>
+      <View style={{ gap: 2 }}>
+        <AppText variant="h2">{title}</AppText>
+        {text ? <AppText muted variant="small">{text}</AppText> : null}
+      </View>
+      {children}
+    </View>
+  );
+}
+
+function SeeAll({ label, onPress }: { label: string; onPress: () => void }) {
+  return (
+    <PressableScale accessibilityRole="link" onPress={onPress} style={styles.seeAll}>
+      <Text maxFontSizeMultiplier={1.6} style={styles.seeAllText}>{label}</Text>
+      <ChevronRight size={20} color={colors.primary} />
+    </PressableScale>
+  );
+}
+
+function CategoryRow({ category: c, index }: { category: CategoryItem; index: number }) {
   const t = useTranslations();
   return (
     <FadeInItem index={index}>
@@ -135,28 +185,37 @@ function CategoryCard({ category: c, index }: { category: CategoryItem; index: n
         accessibilityRole="button"
         accessibilityLabel={`${c.name}, ${t('categories.listingsCount', { count: c.count })}`}
         onPress={() => router.push({ pathname: '/explorar', params: { categoria: c.slug } })}
-        scaleTo={0.95}
+        scaleTo={0.98}
         style={styles.category}
       >
-        <CategoryIcon icon={c.icon} color={c.color} size={44} />
-        <AppText variant="small" numberOfLines={3} style={{ fontWeight: '700' }}>{c.name}</AppText>
-        <AppText variant="caption" muted>{t('categories.listingsCount', { count: c.count })}</AppText>
+        <CategoryIcon icon={c.icon} color={c.color} size={44} round />
+        <View style={{ flex: 1 }}>
+          <AppText style={{ fontWeight: '700' }} numberOfLines={2}>{c.name}</AppText>
+          <AppText variant="caption" muted>{t('categories.listingsCount', { count: c.count })}</AppText>
+        </View>
+        <ChevronRight size={20} color={colors.inkMuted} />
       </PressableScale>
     </FadeInItem>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { gap: space.md },
-  heroIcon: { width: 48, height: 48, borderRadius: radius.md, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center' },
-  searchBox: {
-    flexDirection: 'row', alignItems: 'center', gap: space.sm, minHeight: 56, paddingHorizontal: space.md,
-    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1.5, borderColor: colors.border, ...shadow,
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: space.sm },
+  brand: { fontSize: 20, fontWeight: '800', color: colors.ink, letterSpacing: -0.3 },
+  hero: { gap: space.md, padding: space.xl, paddingTop: space.lg, paddingBottom: space.xxl + space.xl, backgroundColor: colors.primarySoft, borderRadius: soft.block },
+  problem: { gap: space.md, padding: space.xl, backgroundColor: colors.surface, borderRadius: soft.block, ...shadow, shadowOpacity: 0.08, marginTop: -space.xl - space.md },
+  problemInput: {
+    minHeight: 112, padding: space.lg, paddingTop: space.lg, fontSize: 17, lineHeight: 24, color: colors.ink, textAlignVertical: 'top',
+    backgroundColor: colors.background, borderRadius: 20, borderWidth: 2, borderColor: colors.border,
   },
-  searchInput: { flex: 1, fontSize: 17, color: colors.ink, minHeight: MIN_TOUCH },
-  category: {
-    width: CATEGORY_CARD, minHeight: 132, padding: space.md, gap: space.sm,
-    backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, ...shadow,
-  },
-  step: { width: 36, height: 36, borderRadius: radius.full, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  example: { minHeight: MIN_TOUCH - 4, justifyContent: 'center', paddingHorizontal: space.lg, borderRadius: 999, backgroundColor: colors.accentSoft },
+  exampleText: { fontSize: 15, fontWeight: '700', color: colors.accentStrong },
+  seeAll: { minHeight: MIN_TOUCH, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, borderRadius: soft.control, backgroundColor: colors.primarySoft },
+  seeAllText: { fontSize: 16, fontWeight: '700', color: colors.primaryStrong },
+  categories: { backgroundColor: colors.surface, borderRadius: soft.block, padding: space.sm, ...shadow, shadowOpacity: 0.05 },
+  category: { minHeight: 64, flexDirection: 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.md, paddingVertical: space.sm, borderRadius: 18 },
+  steps: { gap: space.lg, padding: space.xl, backgroundColor: colors.surfaceMuted, borderRadius: soft.block },
+  step: { flexDirection: 'row', alignItems: 'center', gap: space.lg },
+  helperCta: { alignItems: 'center', gap: space.md, padding: space.xl, backgroundColor: colors.accentSoft, borderRadius: soft.block },
 });

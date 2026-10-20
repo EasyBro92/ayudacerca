@@ -13,15 +13,81 @@ async function signIn(page: Page, email: string) {
   await expect(page.getByRole('heading', { name: /^Hola, / })).toBeVisible({ timeout: 15_000 });
 }
 
-test('inicio: buscador, categorías de la base de datos y anuncios recientes', async ({ page }) => {
+test('inicio: «cuéntanos tu problema», disponibles ahora, peticiones y categorías de la base de datos', async ({ page }) => {
   await open(page, '/');
-  await expect(page.getByRole('heading', { name: 'Ayuda con la tecnología, sin salir de casa' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Anuncios recientes' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '¿Se te ha rebelado la tecnología?' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Disponibles ahora' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Gente que necesita una mano' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Así de fácil' })).toBeVisible();
+  // Pestañas nuevas: Inicio · Pedir · Ayudar · Mensajes · Yo
+  for (const tab of ['Inicio', 'Pedir', 'Ayudar', 'Mensajes', 'Yo']) await expect(page.getByRole('tab', { name: tab, exact: true })).toBeAttached();
   // Las categorías presenciales están ocultas y no aparecen en la app
   await expect(page.getByRole('button', { name: /^Mascotas,/ })).toHaveCount(0);
   await page.getByRole('button', { name: /^Informática y soporte técnico,/ }).click();
   await expect(page.getByRole('heading', { name: /resultado/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Puesta a punto de ordenadores lentos/ })).toBeVisible();
+});
+
+test('inicio: al contar el problema se sugiere la categoría y «Pedir ayuda» abre el asistente ya rellenado', async ({ page }) => {
+  await open(page, '/');
+  const box = page.getByRole('textbox', { name: 'Cuéntanos tu problema' });
+  await box.fill('Mi ordenador va lento');
+  await expect(page.getByText('Parece cosa de…')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Informática y soporte técnico', exact: true })).toBeVisible();
+  // Un ejemplo rápido rellena el cuadro y elige su categoría
+  await page.getByRole('button', { name: 'No me aclaro con Excel' }).click();
+  await expect(box).toHaveValue('No me aclaro con Excel');
+  await expect(page.getByRole('button', { name: 'Ofimática y datos', exact: true })).toBeVisible();
+  // «Ver quién puede ayudarme» lleva a las ayudas que se ofrecen de esa categoría
+  await page.getByRole('button', { name: 'Ver quién puede ayudarme' }).click();
+  await expect(page.getByRole('heading', { name: /resultado/ })).toBeVisible();
+  await expect(page).toHaveURL(/tipo=ofrecen/);
+  await expect(page).toHaveURL(/categoria=ofimatica-datos/);
+
+  await signIn(page, 'xavier.c@example.com');
+  await open(page, '/');
+  await page.getByRole('textbox', { name: 'Cuéntanos tu problema' }).fill('Mi ordenador va lento y salen anuncios raros');
+  await page.getByRole('button', { name: 'Pedir ayuda', exact: true }).click();
+  await expect(page.getByText(/Paso 2 de 9/)).toBeVisible({ timeout: 20_000 });
+  await expect(page.getByRole('radio', { name: /Informática y soporte técnico/ })).toBeChecked();
+});
+
+test('ayudar: peticiones de gente que necesita una mano e invitación a ofrecer ayuda', async ({ page }) => {
+  await open(page, '/ayudar');
+  await expect(page.getByRole('heading', { name: 'Gente que necesita una mano' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /resultado/ })).toBeVisible();
+  const rows = page.getByRole('link', { name: /^Necesita ayuda\./ });
+  await expect(rows.first()).toBeVisible();
+  await expect(page.getByRole('link', { name: /^Ofrece ayuda\./ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Quiero ayudar' })).toBeVisible();
+});
+
+test('yo: marcarse como disponible ahora, aparecer en Inicio y quitarlo', async ({ page }) => {
+  await signIn(page, 'hugo.m@example.com');
+  const on = page.getByRole('button', { name: 'Estoy disponible' });
+  const off = page.getByRole('button', { name: 'Ya no estoy disponible' });
+  await expect(on.or(off)).toBeVisible();
+  if (await off.isVisible()) { await off.click(); await expect(on).toBeVisible(); }
+  await on.click();
+  await expect(page.getByText(/Disponible hasta las \d{2}:\d{2}/)).toBeVisible();
+  await expect(off).toBeVisible();
+  // Habilidades: separadas por comas, sin repetidos
+  const skills = page.getByRole('textbox', { name: 'Lo que se te da bien' });
+  await skills.fill('Excel, wifi , excel, x');
+  await page.getByRole('button', { name: 'Guardar habilidades' }).click();
+  await expect(page.getByText('Guardado. ¡Gracias por echar una mano!')).toBeVisible();
+  await expect(skills).toHaveValue('Excel, wifi');
+
+  await open(page, '/');
+  const card = page.getByLabel(/^Hugo M\., Disponible ahora, Se le da bien: Excel, wifi$/);
+  await expect(card).toBeAttached({ timeout: 15_000 });
+  await card.scrollIntoViewIfNeeded();
+  await expect(card).toBeVisible();
+
+  await open(page, '/cuenta');
+  await page.getByRole('button', { name: 'Ya no estoy disponible' }).click();
+  await expect(page.getByRole('button', { name: 'Estoy disponible' })).toBeVisible();
+  await expect(page.getByText(/Disponible hasta las/)).toHaveCount(0);
 });
 
 test('detalle: información, consejos de seguridad y contacto que pide iniciar sesión', async ({ page }) => {

@@ -21,7 +21,7 @@ import { useAuth } from '@/lib/auth';
 import { storageUrl } from '@/lib/env';
 import { haptics } from '@/lib/haptics';
 import { type DraftData, type DraftImage, type WizardCategory, getOrCreateDraft, loadWizardCatalog, saveDraft } from '@/lib/publish-data';
-import { MIN_TOUCH, colors, radius, space } from '@/lib/theme';
+import { MIN_TOUCH, colors, radius, space, webTabInset } from '@/lib/theme';
 
 const TOTAL = 9;
 type Errors = Record<string, string>;
@@ -31,7 +31,7 @@ export default function PublishTab() {
   const { session, profile } = useAuth();
   if (!session || !profile) {
     return (
-      <Screen>
+      <Screen contentStyle={{ paddingTop: space.lg + webTabInset }}>
         <AppText variant="h1">{t('publish.title')}</AppText>
         <AppText muted>{t('listing.actionsRequireAccount')}</AppText>
         <Button title={t('auth.signInTitle')} onPress={() => router.push('/entrar')} />
@@ -45,8 +45,11 @@ export default function PublishTab() {
 function Wizard({ userId, emailVerified }: { userId: string; emailVerified: boolean }) {
   const t = useTranslations();
   const locale = useLocale();
-  const params = useLocalSearchParams<{ tipo?: string }>();
+  const params = useLocalSearchParams<{ tipo?: string; texto?: string; categoria?: string }>();
   const kindParam = params.tipo === 'ofrezco' ? 'offer' : params.tipo === 'necesito' ? 'request' : undefined;
+  // Lo que se escribió en «Cuéntanos tu problema» (Inicio): crea un borrador nuevo ya rellenado
+  const prefillText = params.texto?.trim().slice(0, limits.listing.descriptionMax) || undefined;
+  const prefillCategory = params.categoria || undefined;
 
   const [catalog, setCatalog] = useState<{ categories: WizardCategory[]; municipalities: { id: number; name: string; province: string }[] } | null>(null);
   const [draftId, setDraftId] = useState<string | null>(null);
@@ -65,6 +68,8 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
   const [loadError, setLoadError] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const scrollRef = useRef<ScrollViewInstance>(null);
+  // Cada texto que llega desde Inicio crea un solo borrador, aunque la pantalla vuelva a cargar (p. ej. al cambiar de idioma)
+  const prefillDraft = useRef<{ key: string; draft: Promise<Awaited<ReturnType<typeof getOrCreateDraft>>>; settled: boolean } | null>(null);
 
   const applyDraft = useCallback((cat: Awaited<ReturnType<typeof loadWizardCatalog>>, draft: Awaited<ReturnType<typeof getOrCreateDraft>>) => {
     setResult(null); setErrors({}); setConfirmed(false);
@@ -82,15 +87,32 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
     applyDraft(cat, draft);
   };
 
-  // Carga inicial: recupera el último borrador o crea uno
+  // Carga inicial: recupera el último borrador o crea uno (rellenado si se llega desde Inicio)
   useEffect(() => {
     let cancelled = false;
-    Promise.all([loadWizardCatalog(locale), getOrCreateDraft(userId, kindParam, false)]).then(
-      ([cat, draft]) => { if (!cancelled) { setLoadError(false); applyDraft(cat, draft); } },
+    (async () => {
+      const cat = await loadWizardCatalog(locale);
+      const key = prefillText || prefillCategory ? `${prefillText ?? ''}|${prefillCategory ?? ''}` : null;
+      const categoryId = prefillCategory ? cat.categories.find((c) => c.slug === prefillCategory)?.id : undefined;
+      // Las cargas simultáneas comparten el mismo borrador; una vez creado, se retoma como cualquier otro
+      if (key && prefillDraft.current?.key !== key) {
+        const entry = { key, settled: false, draft: getOrCreateDraft(userId, kindParam, false, { description: prefillText, categoryId }) };
+        entry.draft.finally(() => { entry.settled = true; }).catch(() => undefined);
+        prefillDraft.current = entry;
+      }
+      const pending = key && prefillDraft.current && !prefillDraft.current.settled ? prefillDraft.current.draft : null;
+      const draft = await (pending ?? getOrCreateDraft(userId, kindParam, false));
+      return [cat, draft] as const;
+    })().then(
+      ([cat, draft]) => {
+        if (cancelled) return;
+        setLoadError(false);
+        applyDraft(cat, draft);
+      },
       () => { if (!cancelled) setLoadError(true); },
     );
     return () => { cancelled = true; };
-  }, [locale, userId, kindParam, applyDraft, reloadKey]);
+  }, [locale, userId, kindParam, prefillText, prefillCategory, applyDraft, reloadKey]);
 
   // Guardado automático
   useEffect(() => {
@@ -230,7 +252,7 @@ function Wizard({ userId, emailVerified }: { userId: string; emailVerified: bool
               <AppText variant="h1">{t('publish.q2')}</AppText>
               <View style={{ gap: space.sm }}>
                 {catalog.categories.map((c) => (
-                  <PressableScale key={c.id} accessibilityRole="radio" accessibilityState={{ checked: data.categoryId === c.id }} scaleTo={0.98}
+                  <PressableScale key={c.id} accessibilityRole="radio" accessibilityState={{ checked: data.categoryId === c.id }} aria-checked={data.categoryId === c.id} scaleTo={0.98}
                     onPress={() => { if (data.categoryId !== c.id) haptics.selection(); update({ categoryId: c.id, subcategoryId: null, customValues: {} }); }}
                     style={[styles.option, { flexDirection: 'row', alignItems: 'center', gap: space.md }, data.categoryId === c.id && styles.optionSelected]}>
                     <CategoryIcon icon={c.icon} color={c.color} size={40} />
@@ -430,7 +452,7 @@ function ProgressFill({ fraction }: { fraction: number }) {
 
 function Option({ selected, onPress, title, text }: { selected: boolean; onPress: () => void; title: string; text: string }) {
   return (
-    <PressableScale accessibilityRole="radio" accessibilityState={{ checked: selected }} onPress={() => { if (!selected) haptics.selection(); onPress(); }} scaleTo={0.98} style={[styles.option, selected && styles.optionSelected]}>
+    <PressableScale accessibilityRole="radio" accessibilityState={{ checked: selected }} aria-checked={selected} onPress={() => { if (!selected) haptics.selection(); onPress(); }} scaleTo={0.98} style={[styles.option, selected && styles.optionSelected]}>
       <AppText variant="h3">{title}</AppText>
       <AppText muted>{text}</AppText>
     </PressableScale>
@@ -466,7 +488,7 @@ function CustomField({ field, value, error, onChange }: { field: WizardCategory[
 }
 
 const styles = StyleSheet.create({
-  progressWrap: { paddingHorizontal: space.lg, paddingTop: space.sm, gap: space.xs },
+  progressWrap: { paddingHorizontal: space.lg, paddingTop: space.sm + webTabInset, gap: space.xs },
   progressTrack: { height: 8, borderRadius: 4, backgroundColor: colors.surfaceMuted, overflow: 'hidden' },
   progressFill: { height: 8, borderRadius: 4, backgroundColor: colors.primary },
   option: { padding: space.lg, borderRadius: radius.lg, borderWidth: 2, borderColor: colors.border, backgroundColor: colors.surface, gap: 4 },

@@ -13,11 +13,12 @@ const ICONS: Record<string, LucideIcon> = {
   languages: Languages,
 };
 
-export function CategoryIcon({ icon, color, size = 48 }: { icon: string; color: string; size?: number }) {
+/** Icono de categoría sobre su color suave; `round` lo convierte en burbuja (filas y portada). */
+export function CategoryIcon({ icon, color, size = 48, round = false }: { icon: string; color: string; size?: number; round?: boolean }) {
   const Icon = ICONS[icon] ?? Shapes;
   return (
     <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants"
-      style={{ width: size, height: size, borderRadius: size * 0.25, backgroundColor: tint(color, 0.88), alignItems: 'center', justifyContent: 'center' }}>
+      style={{ width: size, height: size, borderRadius: round ? size / 2 : size * 0.3, backgroundColor: tint(color, 0.88), alignItems: 'center', justifyContent: 'center' }}>
       <Icon color={color} size={size * 0.5} strokeWidth={2} />
     </View>
   );

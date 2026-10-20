@@ -18,13 +18,15 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Label>{t('home')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="explorar">
-        <NativeTabs.Trigger.Label>{t('explore')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf="magnifyingglass" md="search" />
-      </NativeTabs.Trigger>
+      {/* «Pedir»: el asistente de publicación, que empieza como petición de ayuda */}
       <NativeTabs.Trigger name="publicar">
-        <NativeTabs.Trigger.Label>{t('publish')}</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'plus.circle', selected: 'plus.circle.fill' }} md="add_circle" />
+        <NativeTabs.Trigger.Label>{t('ask')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'questionmark.bubble', selected: 'questionmark.bubble.fill' }} md="contact_support" />
+      </NativeTabs.Trigger>
+      {/* «Ayudar»: peticiones de gente que necesita una mano */}
+      <NativeTabs.Trigger name="ayudar">
+        <NativeTabs.Trigger.Label>{t('help')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: 'hand.raised', selected: 'hand.raised.fill' }} md="handshake" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="mensajes">
         <NativeTabs.Trigger.Label>{t('messages')}</NativeTabs.Trigger.Label>
@@ -33,7 +35,7 @@ export default function TabsLayout() {
         {count > 0 ? <NativeTabs.Trigger.Badge>{count > 99 ? '99+' : String(count)}</NativeTabs.Trigger.Badge> : null}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="cuenta">
-        <NativeTabs.Trigger.Label>{t('account')}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label>{t('me')}</NativeTabs.Trigger.Label>
         <NativeTabs.Trigger.Icon sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} md="account_circle" />
       </NativeTabs.Trigger>
     </NativeTabs>

@@ -28,6 +28,7 @@ function RootStack() {
       }}
     >
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="explorar" options={{ title: t('nav.explore') }} />
       <Stack.Screen name="anuncio/[slug]" options={{ title: '' }} />
       <Stack.Screen name="conversacion/[id]" options={{ title: t('chat.title') }} />
       {/* Hojas modales con título grande, como los ajustes de iOS */}
