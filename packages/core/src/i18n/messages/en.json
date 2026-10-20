@@ -34,7 +34,7 @@
   },
   "nav": {
     "home": "Home",
-    "explore": "Explore",
+    "explore": "Find help",
     "howItWorks": "How it works",
     "offerHelp": "Offer help",
     "publish": "Post",
@@ -49,7 +49,8 @@
     "safety": "Safety",
     "profile": "Profile",
     "ask": "Ask",
-    "me": "Me"
+    "me": "Me",
+    "helpCenter": "Help"
   },
   "home": {
     "heroTitle": "Has technology turned against you?",

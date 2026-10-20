@@ -34,7 +34,7 @@
   },
   "nav": {
     "home": "Inici",
-    "explore": "Explorar",
+    "explore": "Cercar ajuda",
     "howItWorks": "Com funciona",
     "offerHelp": "Oferir ajuda",
     "publish": "Publicar",
@@ -49,7 +49,8 @@
     "safety": "Seguretat",
     "profile": "Perfil",
     "ask": "Demanar",
-    "me": "Jo"
+    "me": "Jo",
+    "helpCenter": "Ajuda"
   },
   "home": {
     "heroTitle": "Se t’ha rebel·lat la tecnologia?",

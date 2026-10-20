@@ -8,6 +8,7 @@ import { Avatar } from '@/components/common/avatar';
 import { IdentityBadge, ProfessionalBadge, RatingInline } from '@/components/common/badges';
 import { Breadcrumbs } from '@/components/common/breadcrumbs';
 import { CategoryIcon } from '@/components/common/category-icon';
+import { HelperTraits } from '@/components/common/helper-traits';
 import { JsonLd } from '@/components/common/json-ld';
 import { FavoriteButton } from '@/components/listings/favorite-button';
 import { Gallery } from '@/components/listings/gallery';
@@ -221,6 +222,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
               </div>
             </div>
             {listing.author.bio ? <p className="text-ink-muted">{listing.author.bio}</p> : null}
+            <HelperTraits skills={listing.author.skills ?? []} availableUntil={listing.author.available_until ?? null} />
             <div className="flex flex-col gap-2">
               {listing.author.identity_verified ? <IdentityBadge withHelp /> : null}
               {listing.author.professional_verified ? <ProfessionalBadge withHelp /> : null}
@@ -237,7 +239,7 @@ export default async function ListingPage({ params }: PageProps<'/[locale]/anunc
       {similar.length > 0 ? (
         <section aria-labelledby="similar" className="mt-12">
           <h2 id="similar" className="mb-4 text-2xl">{t('similar')}</h2>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="stagger grid gap-3 lg:grid-cols-2">
             {similar.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
           </ul>
         </section>

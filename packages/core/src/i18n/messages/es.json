@@ -34,7 +34,7 @@
   },
   "nav": {
     "home": "Inicio",
-    "explore": "Explorar",
+    "explore": "Buscar ayuda",
     "howItWorks": "Cómo funciona",
     "offerHelp": "Ofrecer ayuda",
     "publish": "Publicar",
@@ -49,7 +49,8 @@
     "safety": "Seguridad",
     "profile": "Perfil",
     "ask": "Pedir",
-    "me": "Yo"
+    "me": "Yo",
+    "helpCenter": "Ayuda"
   },
   "home": {
     "heroTitle": "¿Se te ha rebelado la tecnología?",

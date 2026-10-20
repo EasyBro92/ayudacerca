@@ -18,13 +18,23 @@ export default async function PublishPage({ params, searchParams }: PageProps<'/
   const t = await getTranslations('publish');
 
   const kind: DraftData['kind'] = sp.tipo === 'ofrezco' ? 'offer' : sp.tipo === 'necesito' ? 'request' : undefined;
+  // Viene de «Cuéntanos tu problema» en la portada: borrador nuevo con el texto y la categoría sugerida
+  const texto = typeof sp.texto === 'string' ? sp.texto.trim().slice(0, 600) : '';
+  const categoriaSlug = typeof sp.categoria === 'string' ? sp.categoria : null;
+  const initial: DraftData = kind ? { kind } : {};
+  if (texto) initial.description = texto;
+  if (categoriaSlug) {
+    const { data: cat } = await createSupabasePublicClient().from('categories').select('id').eq('slug', categoriaSlug).eq('is_active', true).maybeSingle();
+    if (cat) initial.categoryId = cat.id;
+  }
+  const prefilled = Boolean(texto || initial.categoryId);
   let draftId = typeof sp.borrador === 'string' ? sp.borrador : null;
-  if (!draftId && sp.nuevo !== '1') {
+  if (!draftId && sp.nuevo !== '1' && !prefilled) {
     const supabase = await createSupabaseServerClient();
     const { data: latest } = await supabase.from('listing_drafts').select('id').order('updated_at', { ascending: false }).limit(1).maybeSingle();
     draftId = latest?.id ?? null;
   }
-  const draft = await getOrCreateDraft({ user, supabase: await createSupabaseServerClient() }, draftId, kind ? { kind } : {});
+  const draft = await getOrCreateDraft({ user, supabase: await createSupabaseServerClient() }, draftId, initial);
   if (kind && !draft.data.kind) draft.data.kind = kind;
 
   const supabase = createSupabasePublicClient();

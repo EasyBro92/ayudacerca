@@ -1,3 +1,4 @@
+import { limits } from '@ayudacerca/core';
 import { LogOut } from 'lucide-react';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -11,6 +12,7 @@ import { requireUser } from '@/server/auth/session';
 import { signOutAction } from '@/server/actions/auth';
 import { getFavoriteListings } from '@/server/data/favorites';
 import { DeleteAccount } from '@/components/account/delete-account';
+import { HelperSettings } from '@/components/account/helper-settings';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -23,7 +25,10 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
 
   const favorites = await getFavoriteListings(locale);
   const supabase = await createSupabaseServerClient();
-  const { data: deletion } = await supabase.from('account_deletion_requests').select('scheduled_for').eq('status', 'pending').maybeSingle();
+  const [{ data: deletion }, { data: helper }] = await Promise.all([
+    supabase.from('account_deletion_requests').select('scheduled_for').eq('status', 'pending').maybeSingle(),
+    supabase.from('profiles').select('skills, available_until').eq('id', user.id).maybeSingle(),
+  ]);
 
   return (
     <div className="container-page py-8">
@@ -43,6 +48,8 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
       {deletion ? <div className="mt-6"><DeleteAccount scheduledFor={deletion.scheduled_for} /></div> : null}
       {!user.emailVerified ? <Alert variant="warning" className="mt-6">{t('emailPending')}</Alert> : null}
 
+      <div className="mt-6"><HelperSettings availableUntil={helper?.available_until ?? null} skills={helper?.skills ?? []} hours={limits.profile.availableHours} /></div>
+
       <Alert variant="info" title={t('nextSteps')} className="mt-6"><p>{t('nextStepsText')}</p></Alert>
 
       <section aria-labelledby="favs" className="mt-10">
@@ -50,7 +57,7 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
         {favorites.length === 0 ? (
           <p className="text-ink-muted">{t('noFavorites')} <Link href="/explorar" className="font-semibold text-primary underline">{tNav('explore')}</Link></p>
         ) : (
-          <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="stagger grid gap-3 lg:grid-cols-2">
             {favorites.map((l) => <li key={l.id}><ListingCard listing={l} saved /></li>)}
           </ul>
         )}

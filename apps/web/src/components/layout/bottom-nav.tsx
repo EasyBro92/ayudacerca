@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, MessageCircle, Plus, Search, UserRound } from 'lucide-react';
+import { HandHeart, HandHelping, Home, MessageCircle, UserRound } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { UnreadDot, useUnreadCount } from '@/components/chat/unread-provider';
 import { Link, usePathname } from '@/i18n/navigation';
@@ -17,10 +17,10 @@ export function BottomNav() {
 
   const items = [
     { href: '/', label: t('home'), Icon: Home, active: pathname === '/' },
-    { href: '/explorar', label: t('explore'), Icon: Search, active: pathname.startsWith('/explorar') || pathname.startsWith('/categorias') },
-    { href: '/publicar', label: t('publish'), Icon: Plus, active: pathname.startsWith('/publicar'), primary: true },
+    { href: '/publicar?tipo=necesito', label: t('ask'), Icon: HandHelping, active: pathname.startsWith('/publicar'), primary: true },
+    { href: '/explorar?tipo=necesitan', label: t('help'), Icon: HandHeart, active: pathname.startsWith('/explorar') || pathname.startsWith('/categorias') },
     { href: '/mensajes', label: t('messages'), Icon: MessageCircle, active: pathname.startsWith('/mensajes'), badge: unread },
-    { href: '/cuenta', label: t('account'), Icon: UserRound, active: pathname.startsWith('/cuenta') || pathname.startsWith('/entrar') },
+    { href: '/cuenta', label: t('me'), Icon: UserRound, active: pathname.startsWith('/cuenta') || pathname.startsWith('/entrar') },
   ];
 
   return (

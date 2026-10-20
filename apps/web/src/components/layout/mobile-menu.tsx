@@ -23,9 +23,10 @@ export function MobileMenu({ signedIn, displayName }: { signedIn: boolean; displ
       <Sheet open={open} onOpenChange={setOpen} title={displayName ?? t('home')} closeLabel={tA11y('closeMenu')}>
         <nav aria-label={tA11y('mainNav')} className="flex flex-col gap-1">
           <Link href="/" className={item} onClick={close}>{t('home')}</Link>
-          <Link href="/explorar" className={item} onClick={close}>{t('explore')}</Link>
+          <Link href="/explorar?tipo=necesitan" className={item} onClick={close}>{t('help')}</Link>
+          <Link href="/explorar?tipo=ofrecen" className={item} onClick={close}>{t('explore')}</Link>
           <Link href="/categorias" className={item} onClick={close}>{t('categories')}</Link>
-          <Link href="/publicar" className={item} onClick={close}>{t('publish')}</Link>
+          <Link href="/publicar?tipo=necesito" className={item} onClick={close}>{t('ask')}</Link>
           <Link href="/como-funciona" className={item} onClick={close}>{t('howItWorks')}</Link>
           <Link href="/ofrecer-ayuda" className={item} onClick={close}>{t('offerHelp')}</Link>
           <Link href="/seguridad" className={item} onClick={close}>{t('safety')}</Link>

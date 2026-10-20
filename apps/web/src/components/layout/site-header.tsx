@@ -1,5 +1,5 @@
 import { brand } from '@ayudacerca/core';
-import { Plus, Search } from 'lucide-react';
+import { HandHelping, Search } from 'lucide-react';
 import { getTranslations } from 'next-intl/server';
 import { MessagesLink } from '@/components/chat/messages-link';
 import { Avatar } from '@/components/common/avatar';
@@ -20,18 +20,18 @@ export async function SiteHeader() {
         </Link>
 
         <nav aria-label={tA11y('mainNav')} className="ml-4 hidden items-center gap-1 lg:flex">
-          <Link href="/explorar" className="rounded-md px-3 py-2 font-semibold hover:bg-surface-muted">{t('explore')}</Link>
-          <Link href="/categorias" className="rounded-md px-3 py-2 font-semibold hover:bg-surface-muted">{t('categories')}</Link>
-          <Link href="/como-funciona" className="rounded-md px-3 py-2 font-semibold hover:bg-surface-muted">{t('howItWorks')}</Link>
-          <Link href="/ofrecer-ayuda" className="rounded-md px-3 py-2 font-semibold hover:bg-surface-muted">{t('offerHelp')}</Link>
+          <Link href="/explorar?tipo=necesitan" className="rounded-full px-3 py-2 font-semibold hover:bg-surface-muted">{t('help')}</Link>
+          <Link href="/explorar?tipo=ofrecen" className="rounded-full px-3 py-2 font-semibold hover:bg-surface-muted">{t('explore')}</Link>
+          <Link href="/categorias" className="rounded-full px-3 py-2 font-semibold hover:bg-surface-muted">{t('categories')}</Link>
+          <Link href="/como-funciona" className="rounded-full px-3 py-2 font-semibold hover:bg-surface-muted">{t('howItWorks')}</Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
           <Button asChild variant="ghost" size="icon" className="lg:hidden">
             <Link href="/explorar" aria-label={t('explore')}><Search aria-hidden /></Link>
           </Button>
-          <Button asChild variant="accent" className="hidden sm:inline-flex">
-            <Link href="/publicar"><Plus aria-hidden /> {t('publish')}</Link>
+          <Button asChild variant="accent" className="hidden rounded-full sm:inline-flex">
+            <Link href="/publicar?tipo=necesito"><HandHelping aria-hidden /> {t('ask')}</Link>
           </Button>
           {user ? <MessagesLink /> : null}
           {user ? (

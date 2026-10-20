@@ -30,9 +30,14 @@ export default async function ExplorePage({ params, searchParams }: PageProps<'/
   const { locale } = await params;
   setRequestLocale(locale as 'es');
   const filters = parseSearchParams(await searchParams);
-  const [t, result, categories, municipalities, favoriteIds] = await Promise.all([
-    getTranslations('explore'), searchListings(filters, locale), getCategories(locale), getMunicipalities(), getFavoriteIds(),
+  const [t, tHome, result, categories, municipalities, favoriteIds] = await Promise.all([
+    getTranslations('explore'), getTranslations('home'), searchListings(filters, locale), getCategories(locale), getMunicipalities(), getFavoriteIds(),
   ]);
+  const kindTabs = [
+    { kind: 'request' as const, label: tHome('requestsTitle') },
+    { kind: 'offer' as const, label: tHome('offersTitle') },
+    { kind: null, label: t('all') },
+  ];
   const options = {
     categories: categories.map((c) => ({ slug: c.slug, name: c.name, subcategories: c.subcategories })),
     municipalities: municipalities.map((m) => ({ slug: m.slug, name: m.name })),
@@ -43,14 +48,28 @@ export default async function ExplorePage({ params, searchParams }: PageProps<'/
 
   return (
     <div className="container-page py-6">
-      <h1 className="text-3xl">{t('heading')}</h1>
+      <h1 className="text-3xl">{filters.kind === 'request' ? t('helpHeading') : filters.kind === 'offer' ? tHome('offersTitle') : t('heading')}</h1>
+
+      <nav aria-label={t('type')} className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+        {kindTabs.map((k) => {
+          const q = toSearchQuery({ ...filters, kind: k.kind, page: 1 });
+          const active = filters.kind === k.kind;
+          return (
+            <Link key={k.label} href={q ? `/explorar?${q}` : '/explorar'} aria-current={active ? 'page' : undefined}
+              className={`press shrink-0 rounded-full px-4 py-2 font-semibold ${active ? 'bg-primary text-on-primary' : 'bg-surface text-ink shadow-[var(--shadow-card)] hover:bg-primary-soft'}`}>
+              {k.label}
+            </Link>
+          );
+        })}
+      </nav>
 
       <form action={localizedPath('/explorar', locale)} method="get" role="search" className="mt-4 flex gap-2">
         <label htmlFor="q" className="sr-only">{t('searchPlaceholder')}</label>
-        <Input id="q" name="q" type="search" defaultValue={filters.q ?? ''} placeholder={t('searchPlaceholder')} />
+        <Input id="q" name="q" type="search" defaultValue={filters.q ?? ''} placeholder={t('searchPlaceholder')} className="rounded-full" />
         {filters.category ? <input type="hidden" name="categoria" value={filters.category} /> : null}
+        {filters.kind ? <input type="hidden" name="tipo" value={filters.kind === 'offer' ? 'ofrecen' : 'necesitan'} /> : null}
         {filters.municipality ? <input type="hidden" name="en" value={filters.municipality} /> : null}
-        <Button type="submit" size="lg">{t('title')}</Button>
+        <Button type="submit" size="lg" className="rounded-full">{t('title')}</Button>
       </form>
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[18rem_1fr]">
@@ -82,7 +101,7 @@ export default async function ExplorePage({ params, searchParams }: PageProps<'/
               </div>
             </div>
           ) : (
-            <ul className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="stagger grid gap-3 xl:grid-cols-2">
               {result.items.map((l) => (
                 <li key={l.id} className="flex"><div className="w-full"><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></div></li>
               ))}

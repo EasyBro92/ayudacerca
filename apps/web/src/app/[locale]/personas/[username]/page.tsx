@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getFormatter, getTranslations, setRequestLocale } from 'next-intl/server';
 import { Avatar } from '@/components/common/avatar';
+import { HelperTraits } from '@/components/common/helper-traits';
 import { IdentityBadge, ProfessionalBadge, RatingInline } from '@/components/common/badges';
 import { ListingCard } from '@/components/listings/listing-card';
 import { Card } from '@/components/ui/card';
@@ -47,6 +48,7 @@ export default async function ProfilePage({ params }: PageProps<'/[locale]/perso
           <RatingInline avg={Number(profile.rating_avg)} count={profile.rating_count} />
           {profile.municipality ? <p className="flex items-center gap-1.5 text-ink-muted"><MapPin aria-hidden className="size-5" />{profile.municipality.name} ({profile.municipality.province})</p> : null}
           {profile.bio ? <p className="max-w-2xl text-lg">{profile.bio}</p> : null}
+          <HelperTraits skills={profile.skills ?? []} availableUntil={profile.available_until ?? null} />
           <div className="flex flex-col gap-2">
             {profile.identity_verified ? <IdentityBadge withHelp /> : null}
             {profile.professional_verified ? <ProfessionalBadge withHelp /> : null}
@@ -60,7 +62,7 @@ export default async function ProfilePage({ params }: PageProps<'/[locale]/perso
 
       <section aria-labelledby="their-listings" className="mt-10">
         <h2 id="their-listings" className="mb-4 text-2xl">{(await getTranslations('categories'))('listingsCount', { count: listings.length })}</h2>
-        <ul className="stagger grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <ul className="stagger grid gap-3 lg:grid-cols-2">
           {listings.map((l) => <li key={l.id}><ListingCard listing={l} saved={favoriteIds.has(l.id)} /></li>)}
         </ul>
       </section>

@@ -62,7 +62,7 @@ const LISTING_DETAIL_SELECT = `
   category:categories!inner ( id, slug, name, icon, color, warnings, restrictions, is_sensitive ),
   subcategory:subcategories ( slug, name ),
   municipality:municipalities!inner ( slug, name, province ),
-  author:profiles!listings_author_id_fkey ( id, username, display_name, avatar_path, bio, account_type, email_verified, identity_verified,
+  author:profiles!listings_author_id_fkey ( id, username, display_name, avatar_path, bio, skills, available_until, account_type, email_verified, identity_verified,
     professional_verified, is_pro, rating_avg, rating_count, completed_services, response_time_minutes, created_at ),
   images:listing_images ( id, path, width, height, alt, position ),
   custom_values:listing_custom_values ( value, field:category_fields!inner ( key, label, field_type, options, is_public, sort_order ) )

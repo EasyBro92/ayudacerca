@@ -18,6 +18,8 @@ export const limits = {
     displayNameMin: 2,
     displayNameMax: 40,
     bioMax: 600,
+    availableHours: 2,
+    skillsMax: 12,
   },
   auth: {
     passwordMin: 10,

@@ -4,22 +4,26 @@ import { dismissCookies, expectAccessible } from './helpers';
 test.describe('páginas públicas', () => {
   test('portada: secciones principales y accesibilidad', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Ayuda con la tecnología');
-    await expect(page.getByRole('heading', { name: 'Anuncios recientes' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Cómo funciona', level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('¿Se te ha rebelado la tecnología?');
+    await expect(page.getByRole('heading', { name: 'Gente que necesita una mano' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Así de fácil', level: 2 })).toBeVisible();
     await dismissCookies(page);
     await expectAccessible(page);
   });
 
-  test('la búsqueda de la portada lleva a Explorar con los filtros en la URL', async ({ page }) => {
+  test('«Cuéntanos tu problema» sugiere la categoría y lleva a pedir ayuda con el texto', async ({ page }) => {
     await page.goto('/');
     await dismissCookies(page);
-    await page.getByLabel('¿Qué necesitas?').fill('python');
-    await page.getByLabel('¿Dónde?').selectOption('madrid');
-    await page.getByRole('button', { name: 'Buscar ayuda' }).click();
-    await expect(page).toHaveURL(/\/explorar\?q=python&en=madrid/);
-    await expect(page.getByRole('heading', { name: /resultado/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Clases de programación en Python/ })).toBeVisible();
+    await page.getByLabel('Cuéntanos tu problema').fill('Mi ordenador va lentísimo y salen anuncios');
+    await expect(page.getByRole('button', { name: /Informática y soporte técnico/ })).toBeVisible();
+    await page.getByRole('link', { name: 'Ver quién puede ayudarme' }).click();
+    await expect(page).toHaveURL(/\/explorar\?tipo=ofrecen&categoria=tecnologia-soporte/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Ayudas que se ofrecen' })).toBeVisible();
+    // Un ejemplo rápido rellena la caja
+    await page.goto('/');
+    await page.getByRole('button', { name: 'No me aclaro con Excel' }).click();
+    await expect(page.getByLabel('Cuéntanos tu problema')).toHaveValue('No me aclaro con Excel');
+    await expect(page.getByRole('link', { name: 'Pedir ayuda' })).toHaveAttribute('href', /tipo=necesito.*categoria=ofimatica-datos|categoria=ofimatica-datos.*tipo=necesito/);
   });
 
   test('explorar: filtros compartibles, estado vacío útil y accesibilidad', async ({ page }) => {
@@ -74,9 +78,9 @@ test.describe('páginas públicas', () => {
   test('catalán e inglés sin mezclar idiomas', async ({ page }) => {
     await page.goto('/ca');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ca');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ajuda amb la tecnologia, sense sortir de casa');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Se t’ha rebel·lat la tecnologia?');
     await page.goto('/en/explorar');
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Find help or people to help');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Requests and help');
   });
 
   test('documento legal marcado como borrador', async ({ page }) => {
