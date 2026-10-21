@@ -36,3 +36,12 @@ describe('safeRedirectPath', () => {
     [undefined, '/'],
   ])('%s → %s', (input, expected) => expect(safeRedirectPath(input)).toBe(expected));
 });
+
+describe('edición del perfil', () => {
+  it('limpia espacios y vacía la presentación', async () => {
+    const { profileUpdateSchema } = await import('./schemas');
+    expect(profileUpdateSchema.parse({ displayName: '  Marta Ruiz ', bio: '   ' })).toEqual({ displayName: 'Marta Ruiz', bio: null });
+    expect(profileUpdateSchema.safeParse({ displayName: 'M', bio: '' }).success).toBe(false);
+    expect(profileUpdateSchema.safeParse({ displayName: 'Marta', bio: 'x'.repeat(601) }).success).toBe(false);
+  });
+});

@@ -35,6 +35,7 @@ PostgreSQL 17 (Supabase) con PostGIS, `pg_trgm`, `unaccent`, `pgcrypto` y `pg_cr
 | `feature_flags`, `platform_settings` | Configuración | Lectura pública de lo marcado como público |
 | `conversations` | Chat sobre un anuncio entre quien escribe (`requester_id`) y quien publicó (`owner_id`). Guarda vista previa y lecturas | Solo participantes leen; se crean solo con `start_conversation()`. Si se borra una cuenta, la conversación queda para la otra persona |
 | `messages` | Mensajes del chat (máx. 2000 caracteres) | Participantes leen e insertan (solo `conversation_id` y `body`). Un disparador valida participante, bloqueos, 20 mensajes/minuto y términos prohibidos (`reject` bloquea, `review` marca `flagged`). En tiempo real (Realtime) |
+| `profile_changes` | Historial de cambios de perfil (nombre, presentación, habilidades, datos privados…): campo, antes, después, quién y cuándo. Lo rellena un disparador; sin clave foránea para sobrevivir a las bajas | Moderación/administración y la propia persona leen; nadie modifica ni borra. Listado: `admin_profile_changes()` |
 | `conversation_reports` | Denuncias de conversaciones | Participantes crean; moderación lee |
 
 Las categorías tienen `is_active`: las presenciales están ocultas por ahora (ADR 0009). La semilla del catálogo hace *upsert*, así que volver a ejecutar la acción «Supabase: subir base de datos» actualiza textos, orden y visibilidad.

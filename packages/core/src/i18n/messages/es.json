@@ -50,7 +50,8 @@
     "profile": "Perfil",
     "ask": "Pedir",
     "me": "Yo",
-    "helpCenter": "Ayuda"
+    "helpCenter": "Ayuda",
+    "admin": "Administración"
   },
   "home": {
     "heroTitle": "¿Se te ha rebelado la tecnología?",
@@ -462,7 +463,16 @@
     "skillsTitle": "Lo que se te da bien",
     "skillsText": "Hasta 12 habilidades separadas por comas (ej.: Excel, WordPress, móviles).",
     "skillsSave": "Guardar habilidades",
-    "skillsSaved": "Guardado. ¡Gracias por echar una mano!"
+    "skillsSaved": "Guardado. ¡Gracias por echar una mano!",
+    "editTitle": "Tu perfil",
+    "editText": "¿Te equivocaste al registrarte? Aquí puedes corregirlo. Por seguridad, guardamos un registro de los cambios.",
+    "displayName": "Nombre visible",
+    "displayNameHelp": "Es el nombre que ven las demás personas. Por ejemplo: «Marta R.».",
+    "bio": "Sobre ti",
+    "bioHelp": "Opcional. Cuenta en qué sueles ayudar o qué necesitas (máx. 600 caracteres).",
+    "saveProfile": "Guardar cambios",
+    "profileSaved": "Hecho. Tu perfil está actualizado.",
+    "noChanges": "No había nada que cambiar."
   },
   "a11y": {
     "skipToContent": "Saltar al contenido",
@@ -664,5 +674,40 @@
     "skills": "Se le da bien",
     "write": "Ver perfil",
     "noneAvailable": "Ahora mismo no hay nadie marcado como disponible. Publica tu petición y te escribirán."
+  },
+  "admin": {
+    "title": "Administración",
+    "changesTitle": "Cambios de perfil",
+    "changesIntro": "Historial de los datos que han cambiado las personas (o el equipo). No se puede modificar ni borrar.",
+    "search": "Buscar por persona o valor",
+    "searchButton": "Buscar",
+    "when": "Cuándo",
+    "person": "Persona",
+    "field": "Dato",
+    "before": "Antes",
+    "after": "Después",
+    "by": "Cambiado por",
+    "self": "La propia persona",
+    "system": "Sistema",
+    "empty": "(vacío)",
+    "noResults": "No hay cambios que mostrar.",
+    "deletedAccount": "Cuenta eliminada",
+    "older": "Ver más antiguos",
+    "newer": "Ver más recientes",
+    "fields": {
+      "display_name": "Nombre visible",
+      "username": "Usuario",
+      "bio": "Sobre ti",
+      "avatar_path": "Foto",
+      "municipality_id": "Municipio",
+      "account_type": "Tipo de cuenta",
+      "languages": "Idiomas",
+      "skills": "Habilidades",
+      "status": "Estado de la cuenta",
+      "first_name": "Nombre legal",
+      "last_name": "Apellidos",
+      "phone": "Teléfono",
+      "postal_code": "Código postal"
+    }
   }
 }

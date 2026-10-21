@@ -101,6 +101,12 @@ export async function updateMyHelperProfile(userId: string, patch: { skills?: st
   if (error) throw error;
 }
 
+/** Nombre visible y presentación. La base de datos registra el cambio para administración. */
+export async function updateMyProfile(userId: string, patch: { display_name: string; bio: string | null }) {
+  const { error } = await supabase.from('profiles').update(patch).eq('id', userId);
+  if (error) throw error;
+}
+
 export async function getMunicipalities() {
   const { data, error } = await supabase.from('municipalities').select('slug, name, province').order('name');
   if (error) throw error;

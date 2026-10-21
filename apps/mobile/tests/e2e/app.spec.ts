@@ -90,6 +90,19 @@ test('yo: marcarse como disponible ahora, aparecer en Inicio y quitarlo', async 
   await expect(page.getByText(/Disponible hasta las/)).toHaveCount(0);
 });
 
+test('yo: corregir el nombre visible (queda registrado para administración)', async ({ page }) => {
+  await signIn(page, 'claudia.f@example.com');
+  const name = page.getByRole('textbox', { name: 'Nombre visible' });
+  await name.fill('C');
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+  await expect(page.getByText('El nombre debe tener al menos 2 caracteres.')).toBeVisible();
+  const newName = `Claudia ${Date.now() % 100000}`;
+  await name.fill(newName);
+  await page.getByRole('button', { name: 'Guardar cambios' }).click();
+  await expect(page.getByText('Hecho. Tu perfil está actualizado.')).toBeVisible();
+  await expect(page.getByRole('heading', { name: `Hola, ${newName}` })).toBeVisible({ timeout: 10_000 });
+});
+
 test('detalle: información, consejos de seguridad y contacto que pide iniciar sesión', async ({ page }) => {
   await open(page, '/anuncio/ayuda-con-el-movil-y-la-tablet-con-paciencia-d001');
   await expect(page.getByRole('heading', { name: 'Ayuda con el móvil y la tablet, con paciencia' })).toBeVisible();

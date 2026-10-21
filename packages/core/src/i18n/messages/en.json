@@ -50,7 +50,8 @@
     "profile": "Profile",
     "ask": "Ask",
     "me": "Me",
-    "helpCenter": "Help"
+    "helpCenter": "Help",
+    "admin": "Admin"
   },
   "home": {
     "heroTitle": "Has technology turned against you?",
@@ -462,7 +463,16 @@
     "skillsTitle": "What you’re good at",
     "skillsText": "Up to 12 skills separated by commas (e.g. Excel, WordPress, phones).",
     "skillsSave": "Save skills",
-    "skillsSaved": "Saved. Thanks for lending a hand!"
+    "skillsSaved": "Saved. Thanks for lending a hand!",
+    "editTitle": "Your profile",
+    "editText": "Made a mistake when signing up? Fix it here. For safety, we keep a record of changes.",
+    "displayName": "Display name",
+    "displayNameHelp": "The name others see. For example: “Marta R.”.",
+    "bio": "About you",
+    "bioHelp": "Optional. Say what you usually help with or need (max 600 characters).",
+    "saveProfile": "Save changes",
+    "profileSaved": "Done. Your profile is up to date.",
+    "noChanges": "Nothing to change."
   },
   "a11y": {
     "skipToContent": "Skip to content",
@@ -664,5 +674,40 @@
     "skills": "Good at",
     "write": "View profile",
     "noneAvailable": "Nobody is marked as available right now. Post your request and people will message you."
+  },
+  "admin": {
+    "title": "Administration",
+    "changesTitle": "Profile changes",
+    "changesIntro": "History of data changed by people (or the team). It cannot be edited or deleted.",
+    "search": "Search by person or value",
+    "searchButton": "Search",
+    "when": "When",
+    "person": "Person",
+    "field": "Field",
+    "before": "Before",
+    "after": "After",
+    "by": "Changed by",
+    "self": "The person themselves",
+    "system": "System",
+    "empty": "(empty)",
+    "noResults": "No changes to show.",
+    "deletedAccount": "Deleted account",
+    "older": "Show older",
+    "newer": "Show newer",
+    "fields": {
+      "display_name": "Display name",
+      "username": "Username",
+      "bio": "About",
+      "avatar_path": "Photo",
+      "municipality_id": "Town",
+      "account_type": "Account type",
+      "languages": "Languages",
+      "skills": "Skills",
+      "status": "Account status",
+      "first_name": "Legal first name",
+      "last_name": "Last name",
+      "phone": "Phone",
+      "postal_code": "Postcode"
+    }
   }
 }

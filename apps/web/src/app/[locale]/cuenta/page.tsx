@@ -8,11 +8,12 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Link } from '@/i18n/navigation';
-import { requireUser } from '@/server/auth/session';
+import { isStaff, requireUser } from '@/server/auth/session';
 import { signOutAction } from '@/server/actions/auth';
 import { getFavoriteListings } from '@/server/data/favorites';
 import { DeleteAccount } from '@/components/account/delete-account';
 import { HelperSettings } from '@/components/account/helper-settings';
+import { ProfileForm } from '@/components/account/profile-form';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
@@ -23,11 +24,11 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
   const user = await requireUser(locale, '/cuenta');
   const [t, tNav] = await Promise.all([getTranslations('account'), getTranslations('nav')]);
 
-  const favorites = await getFavoriteListings(locale);
+  const [favorites, staff] = await Promise.all([getFavoriteListings(locale), isStaff()]);
   const supabase = await createSupabaseServerClient();
   const [{ data: deletion }, { data: helper }] = await Promise.all([
     supabase.from('account_deletion_requests').select('scheduled_for').eq('status', 'pending').maybeSingle(),
-    supabase.from('profiles').select('skills, available_until').eq('id', user.id).maybeSingle(),
+    supabase.from('profiles').select('skills, available_until, bio').eq('id', user.id).maybeSingle(),
   ]);
 
   return (
@@ -37,7 +38,10 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
         <div className="flex-1">
           <h1 className="text-3xl">{t('hello', { name: user.displayName })}</h1>
           <p className="text-ink-muted">{t('summary')}</p>
-          <Link href={`/personas/${user.username}`} className="font-semibold text-primary underline-offset-4 hover:underline">{tNav('profile')}</Link>
+          <span className="flex flex-wrap gap-x-4">
+            <Link href={`/personas/${user.username}`} className="font-semibold text-primary underline-offset-4 hover:underline">{tNav('profile')}</Link>
+            {staff ? <Link href="/admin/cambios" className="font-semibold text-primary underline-offset-4 hover:underline">{tNav('admin')}</Link> : null}
+          </span>
         </div>
         <form action={signOutAction}>
           <input type="hidden" name="locale" value={locale} />
@@ -47,6 +51,8 @@ export default async function AccountPage({ params }: PageProps<'/[locale]/cuent
 
       {deletion ? <div className="mt-6"><DeleteAccount scheduledFor={deletion.scheduled_for} /></div> : null}
       {!user.emailVerified ? <Alert variant="warning" className="mt-6">{t('emailPending')}</Alert> : null}
+
+      <div className="mt-6"><ProfileForm displayName={user.displayName} bio={helper?.bio ?? null} /></div>
 
       <div className="mt-6"><HelperSettings availableUntil={helper?.available_until ?? null} skills={helper?.skills ?? []} hours={limits.profile.availableHours} /></div>
 

@@ -50,7 +50,8 @@
     "profile": "Perfil",
     "ask": "Demanar",
     "me": "Jo",
-    "helpCenter": "Ajuda"
+    "helpCenter": "Ajuda",
+    "admin": "Administració"
   },
   "home": {
     "heroTitle": "Se t’ha rebel·lat la tecnologia?",
@@ -462,7 +463,16 @@
     "skillsTitle": "El que se’t dona bé",
     "skillsText": "Fins a 12 habilitats separades per comes (ex.: Excel, WordPress, mòbils).",
     "skillsSave": "Desar habilitats",
-    "skillsSaved": "Desat. Gràcies per donar un cop de mà!"
+    "skillsSaved": "Desat. Gràcies per donar un cop de mà!",
+    "editTitle": "El teu perfil",
+    "editText": "T’has equivocat en registrar-te? Aquí ho pots corregir. Per seguretat, guardem un registre dels canvis.",
+    "displayName": "Nom visible",
+    "displayNameHelp": "És el nom que veuen les altres persones. Per exemple: «Marta R.».",
+    "bio": "Sobre tu",
+    "bioHelp": "Opcional. Explica en què sols ajudar o què necessites (màx. 600 caràcters).",
+    "saveProfile": "Desar canvis",
+    "profileSaved": "Fet. El teu perfil està actualitzat.",
+    "noChanges": "No hi havia res a canviar."
   },
   "a11y": {
     "skipToContent": "Saltar al contingut",
@@ -664,5 +674,40 @@
     "skills": "Se li dona bé",
     "write": "Veure perfil",
     "noneAvailable": "Ara mateix no hi ha ningú marcat com a disponible. Publica la teva petició i t’escriuran."
+  },
+  "admin": {
+    "title": "Administració",
+    "changesTitle": "Canvis de perfil",
+    "changesIntro": "Historial de les dades que han canviat les persones (o l’equip). No es pot modificar ni esborrar.",
+    "search": "Cercar per persona o valor",
+    "searchButton": "Cercar",
+    "when": "Quan",
+    "person": "Persona",
+    "field": "Dada",
+    "before": "Abans",
+    "after": "Després",
+    "by": "Canviat per",
+    "self": "La mateixa persona",
+    "system": "Sistema",
+    "empty": "(buit)",
+    "noResults": "No hi ha canvis a mostrar.",
+    "deletedAccount": "Compte eliminat",
+    "older": "Veure’n de més antics",
+    "newer": "Veure’n de més recents",
+    "fields": {
+      "display_name": "Nom visible",
+      "username": "Usuari",
+      "bio": "Sobre tu",
+      "avatar_path": "Foto",
+      "municipality_id": "Municipi",
+      "account_type": "Tipus de compte",
+      "languages": "Idiomes",
+      "skills": "Habilitats",
+      "status": "Estat del compte",
+      "first_name": "Nom legal",
+      "last_name": "Cognoms",
+      "phone": "Telèfon",
+      "postal_code": "Codi postal"
+    }
   }
 }

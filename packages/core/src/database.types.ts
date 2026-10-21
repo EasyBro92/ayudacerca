@@ -424,6 +424,20 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"profile_changes": {
+                  Row: {
+                    "changed_by": string | null,"created_at": string,"field": string,"id": number,"new_value": string | null,"old_value": string | null,"profile_id": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "changed_by"?: string | null,"created_at"?: string,"field": string,"id"?: never,"new_value"?: string | null,"old_value"?: string | null,"profile_id": string
+                  }
+                  Update: {
+                    "changed_by"?: string | null,"created_at"?: string,"field"?: string,"id"?: never,"new_value"?: string | null,"old_value"?: string | null,"profile_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"profiles": {
                   Row: {
                     "account_type": Database["public"]['Enums']["account_type"],"available_until": string | null,"avatar_path": string | null,"bio": string | null,"completed_services": number,"created_at": string,"display_name": string,"email_verified": boolean,"id": string,"identity_verified": boolean,"is_pro": boolean,"languages": (string)[],"last_active_at": string | null,"municipality_id": number | null,"phone_verified": boolean,"professional_verified": boolean,"rating_avg": number,"rating_count": number,"response_time_minutes": number | null,"skills": (string)[],"status": Database["public"]['Enums']["account_status"],"updated_at": string,"username": string
@@ -568,7 +582,12 @@ isOneToOne: false
             [_ in never]: never
           }
           Functions: {
-            "approximate_point":
+            "admin_profile_changes":
+{ Args: { "p_limit"?: number,"p_offset"?: number,"p_query"?: string }; Returns: {
+              "changed_by": string,"changed_by_display_name": string,"changed_by_self": boolean,"created_at": string,"field": string,"id": number,"new_value": string,"old_value": string,"profile_display_name": string,"profile_id": string,"profile_username": string
+            }[]
+                           },
+"approximate_point":
 { Args: { "lat": number,"lng": number }; Returns: unknown
                            },
 "cancel_account_deletion":

@@ -1,4 +1,4 @@
-import { brand, limits } from '@ayudacerca/core';
+import { brand, limits, profileUpdateSchema } from '@ayudacerca/core';
 import { LOCALE_NAMES, LOCALES } from '@ayudacerca/core/i18n';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
@@ -14,7 +14,7 @@ import { Screen } from '@/components/screen';
 import { AppText, Button, Card, Chip, Notice, TextField } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { confirmAction } from '@/lib/confirm';
-import { type ListingCardData, getFavoriteListings, isAvailableNow, parseSkills, updateMyHelperProfile } from '@/lib/data';
+import { type ListingCardData, getFavoriteListings, isAvailableNow, parseSkills, updateMyHelperProfile, updateMyProfile } from '@/lib/data';
 import { haptics } from '@/lib/haptics';
 import { webUrl } from '@/lib/env';
 import { useAppLocale } from '@/lib/i18n';
@@ -114,6 +114,8 @@ export default function AccountScreen() {
         </Notice>
       ) : null}
 
+      <ProfileCard key={`p-${profile.id}`} userId={profile.id} displayName={profile.display_name} bio={profile.bio ?? null} onSaved={refreshProfile} />
+
       <HelperCard key={profile.id} userId={profile.id} availableUntil={profile.available_until} skills={profile.skills} onSaved={refreshProfile} />
 
       <AppText variant="h2">{t('account.favorites')}</AppText>
@@ -135,6 +137,61 @@ export default function AccountScreen() {
 }
 
 /** «¿Puedes ayudar ahora?» (disponible unas horas, se apaga sola) y «Lo que se te da bien». */
+function ProfileCard({ userId, displayName, bio, onSaved }: { userId: string; displayName: string; bio: string | null; onSaved: () => Promise<void> }) {
+  const t = useTranslations('account');
+  const tValidation = useTranslations('validation');
+  const tErrors = useTranslations('errors');
+  const tCommon = useTranslations('common');
+  const [name, setName] = useState(displayName);
+  const [about, setAbout] = useState(bio ?? '');
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<{ displayName?: string; bio?: string }>({});
+  const [message, setMessage] = useState<{ tone: 'success' | 'info' | 'danger'; text: string } | null>(null);
+
+  async function save() {
+    setMessage(null);
+    const parsed = profileUpdateSchema.safeParse({ displayName: name, bio: about });
+    if (!parsed.success) {
+      const out: { displayName?: string; bio?: string } = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as 'displayName' | 'bio';
+        out[key] ??= tValidation(issue.message as 'nameTooShort');
+      }
+      setErrors(out);
+      haptics.error();
+      return;
+    }
+    setErrors({});
+    if (parsed.data.displayName === displayName && parsed.data.bio === (bio ?? null)) {
+      setMessage({ tone: 'info', text: t('noChanges') });
+      return;
+    }
+    setBusy(true);
+    try {
+      await updateMyProfile(userId, { display_name: parsed.data.displayName, bio: parsed.data.bio });
+      setName(parsed.data.displayName);
+      setMessage({ tone: 'success', text: t('profileSaved') });
+      haptics.success();
+      void onSaved();
+    } catch {
+      setMessage({ tone: 'danger', text: tErrors('unavailable') });
+      haptics.error();
+    }
+    setBusy(false);
+  }
+
+  return (
+    <Card style={{ padding: space.lg, gap: space.sm }}>
+      <AppText variant="h3">{t('editTitle')}</AppText>
+      <AppText variant="small" muted>{t('editText')}</AppText>
+      <TextField label={t('displayName')} help={t('displayNameHelp')} value={name} onChangeText={setName} maxLength={limits.profile.displayNameMax} autoComplete="nickname" error={errors.displayName ?? null} />
+      <TextField label={t('bio')} help={t('bioHelp')} value={about} onChangeText={setAbout} maxLength={limits.profile.bioMax} multiline style={{ minHeight: 96, textAlignVertical: 'top' }} error={errors.bio ?? null} />
+      <Button title={busy ? tCommon('loading') : t('saveProfile')} loading={busy} onPress={() => void save()} />
+      {message ? <Notice tone={message.tone}>{message.text}</Notice> : null}
+    </Card>
+  );
+}
+
 function HelperCard({ userId, availableUntil, skills, onSaved }: { userId: string; availableUntil: string | null; skills: string[]; onSaved: () => Promise<void> }) {
   const t = useTranslations('account');
   const format = useFormatter();

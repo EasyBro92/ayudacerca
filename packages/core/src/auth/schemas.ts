@@ -43,3 +43,10 @@ export function safeRedirectPath(value: unknown, fallback = '/'): string {
   if (/[\r\n]/.test(value)) return fallback;
   return value;
 }
+
+/** Edición del perfil público (nombre visible y presentación). */
+export const profileUpdateSchema = z.object({
+  displayName: displayNameSchema,
+  bio: z.string().trim().max(limits.profile.bioMax, { error: 'tooLong' }).transform((s) => (s === '' ? null : s)),
+});
+export type ProfileUpdateInput = z.input<typeof profileUpdateSchema>;

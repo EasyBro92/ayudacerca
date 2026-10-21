@@ -1,6 +1,6 @@
 'use server';
 
-import { type ApiResult, fail, limits, ok } from '@ayudacerca/core';
+import { type ApiResult, fail, fieldErrorsFromIssues, limits, ok, profileUpdateSchema } from '@ayudacerca/core';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -41,4 +41,26 @@ export async function saveSkillsAction(raw: unknown): Promise<ApiResult<{ skills
   }
   revalidatePath('/', 'layout');
   return ok({ skills: parsed.data });
+}
+
+/** Cambia el nombre visible y la presentación. La base de datos registra cada cambio (profile_changes). */
+export async function updateProfileAction(raw: unknown): Promise<ApiResult<{ changed: boolean; displayName: string }>> {
+  const parsed = profileUpdateSchema.safeParse(raw);
+  if (!parsed.success) return fail('validation', 'validation', fieldErrorsFromIssues(parsed.error.issues));
+  const user = await getCurrentUser();
+  if (!user) return fail('unauthenticated');
+  const supabase = await createSupabaseServerClient();
+  const { data: current } = await supabase.from('profiles').select('display_name, bio').eq('id', user.id).maybeSingle();
+  if (!current) return fail('not_found');
+  if (current.display_name === parsed.data.displayName && (current.bio ?? null) === parsed.data.bio) {
+    return ok({ changed: false, displayName: current.display_name });
+  }
+  const { error } = await supabase.from('profiles').update({ display_name: parsed.data.displayName, bio: parsed.data.bio }).eq('id', user.id);
+  if (error) {
+    log('warn', 'profile.update_failed', { code: error.code });
+    return fail('internal');
+  }
+  log('info', 'profile.updated', {});
+  revalidatePath('/', 'layout');
+  return ok({ changed: true, displayName: parsed.data.displayName });
 }

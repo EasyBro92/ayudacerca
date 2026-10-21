@@ -44,3 +44,12 @@ export async function requireUser(locale: string, returnTo: string): Promise<Cur
   }
   return user;
 }
+
+/** ¿La persona tiene rol de moderación o administración? (lo decide la base de datos) */
+export const isStaff = cache(async (): Promise<boolean> => {
+  const user = await getCurrentUser();
+  if (!user) return false;
+  const supabase = await createSupabaseServerClient();
+  const { data } = await supabase.rpc('has_staff_role', { required: 'moderator' });
+  return data === true;
+});
