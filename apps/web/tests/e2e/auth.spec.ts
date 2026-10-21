@@ -94,3 +94,9 @@ test('eliminar la cuenta desde la web y cancelarlo dentro del plazo', async ({ p
   await page.getByRole('button', { name: 'Cancelar la eliminación' }).click();
   await expect(page.getByText(/Tu cuenta se eliminará el/)).toBeHidden();
 });
+
+test('un enlace de confirmación que llega a la portada (/?code=…) se reconduce a /auth/callback', async ({ page }) => {
+  await page.goto('/?code=00000000-0000-4000-a000-000000000000');
+  // Código inventado: la web lo intenta canjear y, al no ser válido, pide iniciar sesión
+  await expect(page).toHaveURL(/\/entrar\?aviso=enlace/);
+});

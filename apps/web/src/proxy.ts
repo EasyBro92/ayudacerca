@@ -49,6 +49,17 @@ export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api/v1') && request.method === 'OPTIONS') {
     return new NextResponse(null, { status: 204, headers: corsHeaders(request.headers.get('origin')) });
   }
+  // Si Supabase manda el enlace de confirmación a la «Site URL» (p. ej. /?code=…) en vez de a
+  // /auth/callback, lo reconducimos para que la cuenta se confirme igualmente.
+  const authCode = request.nextUrl.searchParams.get('code');
+  if (authCode && request.method === 'GET' && !request.nextUrl.pathname.startsWith('/auth/') && !request.nextUrl.pathname.startsWith('/api')
+      && /^[0-9a-f-]{20,64}$/i.test(authCode)) {
+    const callback = new URL('/auth/callback', request.nextUrl.origin);
+    callback.searchParams.set('code', authCode);
+    callback.searchParams.set('next', '/cuenta');
+    return NextResponse.redirect(callback);
+  }
+
   const nonce = Buffer.from(crypto.randomUUID()).toString('base64');
   const csp = contentSecurityPolicy(nonce);
   const correlationId = request.headers.get('x-correlation-id') ?? crypto.randomUUID();
